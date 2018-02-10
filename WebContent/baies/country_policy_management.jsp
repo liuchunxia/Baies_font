@@ -76,6 +76,28 @@ $(document).ready(function() {
 					$('#edit_title_input').val('');
 					$('#edit_content_editor').val('');
 					$('#edit_window').jqxWindow('open');
+                    $("#edit_window_ok_button").one('click', function(event) {
+                        var post_data = {title:"", body:"", kind_id:""}
+
+                        post_data.title = $('#edit_title_input').val();
+                        post_data.body = $('#edit_content_editor').val();
+                        post_data.kind_id = 1
+                        console.log("add a post", post_data)
+                        $.ajax({
+                            type:'POST',
+                            url:'http://127.0.0.1:5000/qualitative/Post',
+                            data: post_data,
+                            withCredentials: true,
+                            async: false,
+                            success: function (resp) {
+                                if(event.args.dialogResult.OK) {
+                                    $('#message_notification_content').html('信息已保存。');
+                                    $('#message_notification').jqxNotification('open');
+                                    window.location.reload();
+                                }
+                            }
+                        })
+                    });
 				});
 			}
 	};
@@ -100,6 +122,7 @@ $(document).ready(function() {
 		$('#edit_title_input').val('<fmt:message key="temp.policy_title" />');
 		$('#edit_content_editor').val($('<div />').html($('#editor_content').html()).text());
 		$('#edit_window').jqxWindow('open');
+
 	});
 	
 	$('.delete_buttons').on('click', function() {
@@ -131,10 +154,7 @@ $(document).ready(function() {
 		theme: '<%=jqx_theme %>'
 	});
 	
-	$("#edit_window_ok_button").on('click', function(event) {
-		$('#message_notification_content').html('信息已保存。');
-		$('#message_notification').jqxNotification('open');
-	});
+
 	
 	$("#edit_window_cancel_button").jqxButton({
 		theme: '<%=jqx_theme %>'

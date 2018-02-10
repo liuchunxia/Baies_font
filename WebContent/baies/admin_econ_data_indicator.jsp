@@ -110,19 +110,8 @@ $(document).ready(function() {
 		width: 'auto', position: "bottom-right", opacity: 0.9, template: 'success', theme: '<%=jqx_theme %>'
 	});
 
-	$('#variable_add_button').on('click', function(event) {
-		$('#dialog_window_content').html('<table><tr><td>请输入名称:</td><td><input type="type"></td></tr>'
-				+ '<tr><td>请输入单位:</td><td><input type="text"></td></tr>'+
-			'\'<tr><td>请输入中文名:</td><td><input type="text"></td></tr>'+
-			'<tr><td>请输入英文名:</td><td><input type="text"></td></tr>'+'</table>');
-		$('#dialog_window').one('close', function(event) {
-			if(event.args.dialogResult.OK) {
-				$('#message_notification_content').html('添加成功。');
-				$('#message_notification').jqxNotification('open');
-			}
-		});
-		$('#dialog_window').jqxWindow('open');
-	});
+	// 表编辑
+
 	
 	$('#cat_add_button').on('click', function(event) {
 		$('#dialog_window_content').html('<p>请输入表在数据库的名字: <input type="text" id="d_table_editor_name"></p>\n ' +
@@ -186,10 +175,11 @@ $(document).ready(function() {
         $('#dialog_window').jqxWindow('open');
     });
 
-    $('#cat_delete_button, #product_delete_button, #variable_delete_button').on('click', function(event) {
+    $('#cat_delete_button').on('click', function(event) {
         $('#dialog_window_content').html('是否删除？');
         $('#dialog_window').one('close', function(event) {
             if(event.args.dialogResult.OK) {
+                console.log("table delete")
                 var post_data = {id:$('#cat_tree').jqxTree('getSelectedItem').value}
                 console.log('post', post_data)
                 $.ajax({
@@ -208,19 +198,100 @@ $(document).ready(function() {
         });
         $('#dialog_window').jqxWindow('open');
     });
-	
+
+    // 指标编辑
+
+
+    $('#variable_add_button').on('click', function(event) {
+        $('#dialog_window_content').html('<table><tr><td>请输入名称:</td><td><input id="d_index_editor_name" type="type"></td></tr>'
+            + '<tr><td>请输入单位:</td><td><input id="d_index_editor_unit" type="text"></td></tr>'+
+            '\'<tr><td>请输入中文名:</td><td><input id="d_index_editor_cn_alis" type="text"></td></tr>'+
+            '<tr><td>请输入英文名:</td><td><input id="d_index_editor_en_alis" type="text"></td></tr>'+'</table>');
+        $('#dialog_window').one('close', function(event) {
+            var post_data = {name:'', cn_alis: '', en_alis:'', unit:'', table_id:0}
+
+            post_data.name = $('#d_index_editor_name').val()
+            post_data.cn_alis = $('#d_index_editor_cn_alis').val()
+            post_data.en_alis = $('#d_index_editor_en_alis').val()
+			post_data.unit = $('#d_index_editor_unit').val()
+            post_data.table_id = $('#cat_tree').jqxTree('getSelectedItem').value
+            $.ajax({
+                type:'POST',
+                url:'http://127.0.0.1:5000/quantify/socioeconomic_index',
+                data: post_data,
+                withCredentials: true,
+                async: false,
+                success: function (resp) {
+                    if(event.args.dialogResult.OK) {
+                        $('#message_notification_content').html('编辑成功。');
+                        $('#message_notification').jqxNotification('open');
+                        window.location.reload();
+                    }
+                }
+            })
+        });
+        $('#dialog_window').jqxWindow('open');
+    });
+
 	$('#variable_edit_button').on('click', function(event) {
-		$('#dialog_window_content').html('<table><tr><td>请输入名称:</td><td><input type="text"></td></tr>'
-				+ '<tr><td>请输入单位:</td><td><input type="text"></td></tr></table>');
+		$('#dialog_window_content').html('<table><tr><td>请输入名称:</td><td><input id="d_index_editor_name" type="type"></td></tr>'
+            + '<tr><td>请输入单位:</td><td><input id="d_index_editor_unit" type="text"></td></tr>'+
+            '\'<tr><td>请输入中文名:</td><td><input id="d_index_editor_cn_alis" type="text"></td></tr>'+
+            '<tr><td>请输入英文名:</td><td><input id="d_index_editor_en_alis" type="text"></td></tr>'+'</table>');
 		$('#dialog_window').one('close', function(event) {
-			if(event.args.dialogResult.OK) {
-				$('#message_notification_content').html('编辑成功。');
-				$('#message_notification').jqxNotification('open');
-			}
+            var post_data = {name:'', cn_alis: '', en_alis:'', unit:'', table_id:0}
+
+
+            post_data.name = $('#d_index_editor_name').val()
+            post_data.cn_alis = $('#d_index_editor_cn_alis').val()
+            post_data.en_alis = $('#d_index_editor_en_alis').val()
+            post_data.unit = $('#d_index_editor_unit').val()
+            post_data.table_id = $('#cat_tree').jqxTree('getSelectedItem').value
+            post_data.id = $('#variable_list').jqxListBox('getSelectedItem').value
+            if(event.args.dialogResult.OK) {
+			$.ajax({
+                type:'PUT',
+                url:'http://127.0.0.1:5000/quantify/socioeconomic_index',
+                data: post_data,
+                withCredentials: true,
+                async: false,
+                success: function (resp) {
+
+                        $('#message_notification_content').html('编辑成功。');
+                        $('#message_notification').jqxNotification('open');
+                        window.location.reload();
+
+                }
+            })
+            }
 		});
 		$('#dialog_window').jqxWindow('open');
 	});
 
+
+    $('#variable_delete_button').on('click', function(event) {
+        $('#dialog_window_content').html('是否删除？');
+        $('#dialog_window').one('close', function(event) {
+            if(event.args.dialogResult.OK) {
+                console.log("index delete")
+                var post_data = {id:$('#variable_list').jqxListBox('getSelectedItem').value}
+                console.log('post', post_data)
+                $.ajax({
+                    type:'DELETE',
+                    url:'http://127.0.0.1:5000/quantify/socioeconomic_index',
+                    data: post_data,
+                    withCredentials: true,
+                    async: false,
+                    success: function (resp) {
+                        $('#message_notification_content').html('删除成功。');
+                        $('#message_notification').jqxNotification('open');
+                        window.location.reload()
+                    }
+                })
+            }
+        });
+        $('#dialog_window').jqxWindow('open');
+    });
 
 
     // 处理事件
