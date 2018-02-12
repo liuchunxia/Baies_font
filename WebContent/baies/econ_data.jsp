@@ -172,8 +172,8 @@ $(document).ready(function() {
         console.log('qu', query_args)
     })
     var values = $('#time_slider').jqxSlider('values');
-    query_args.start_time = values[0]
-    query_args.end_time = values[1]
+    query_args.start_time = values[0];
+    query_args.end_time = values[1];
 
     $('#time_slider').on('change', function (event) {
         var values = $('#time_slider').jqxSlider('values');

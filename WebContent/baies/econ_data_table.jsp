@@ -19,16 +19,134 @@ String jqx_theme = (String)request.getSession().getAttribute("jqx_theme");
 
 page_id = 2;
 
+
+removeByValue = function(ary,val) {
+    var index = ary.indexOf(val);
+    if (index > -1) {
+        ary.splice(index, 1);
+    }
+};
+
+
+function getQueryString() {
+    var qs = location.search.substr(1), // 获取url中"?"符后的字串
+        args = {}, // 保存参数数据的对象
+        items = qs.length ? qs.split("&") : [], // 取得每一个参数项,
+        item = null,
+        len = items.length;
+
+    for(var i = 0; i < len; i++) {
+        item = items[i].split("=");
+        var name = decodeURIComponent(item[0]),
+            value = decodeURIComponent(item[1]);
+        if(name) {
+            console.log(value)
+            args[name] = $.parseJSON(value);
+        }
+    }
+    return args;
+}
+
+var table_index_data= {};
+var table_data = [];
+var country_data = [];
+var index_data = [];
+var query_args = getQueryString()
+
 $(document).ready(function() {
 	
 	var cat_tree_src = econ_data_cat_tree_src_<fmt:message key="common.language" />;
-	
-	$('#cat_expander').jqxExpander({
+
+
+    $.ajax({
+        type:'GET',
+        url:'http://127.0.0.1:5000/quantify/socioeconomic_table',
+        data: {},
+        withCredentials: true,
+        async: false,
+        success: function (resp) {
+            for (var table in resp.data) {
+                console.log('table', resp.data[table])
+                table_data.push({label: resp.data[table].name, value: resp.data[table].id, id:resp.data[table].id})
+                table_index_data[resp.data[table].id] = resp.data[table].indexes
+            }
+            console.log('table', table_data, 'index', table_index_data)
+            // $('#cat_tree').jqxTree('refresh')
+            // $('#variable_list').jqxListBox('render')
+            // $('#cat_expander').jqxExpander('refresh')
+        }.bind(this)
+    })
+
+    $.ajax({
+        type:'GET',
+        url:'http://127.0.0.1:5000/quantify/country',
+        data: {},
+        withCredentials: true,
+        async: false,
+        success: function (resp) {
+            for (var index in resp.data) {
+                country_data.push(resp.data[index])
+            }
+            console.log(country_data,'r2')}.bind(this)
+    });
+
+    var local_data = [
+    ];
+    var data_fields = [
+        {name: 'location', type: 'string', map: '0'},
+        {name: 'variable', type: 'string', map: '1'}
+    ];
+    var data_columns = [
+        {text: '<fmt:message key="common.dimension.country" />', datafield: 'location', width: 70},
+        {text: '<fmt:message key="common.dimension.indicator" />', datafield: 'variable', width: 100}];
+
+    var tmp = function init_data_columns () {
+		for (var year = query_args.start_time;year<=query_args.end_time; year++){
+            data_fields.push({name: 'y'+year, type: 'number', map: (year - query_args.start_time + 2).toString()} );
+		 	data_columns.push({text: year.toString(), datafield: 'y'+year, width: 70, cellsalign: 'right'})
+			console.log('fill',year)
+		}
+        $.ajax({
+            type:'GET',
+            url:'http://127.0.0.1:5000/quantify/socioeconomic_facts'+location.search,
+            data: {},
+            withCredentials: true,
+            async: false,
+            success: function (resp) {
+                for (var index in resp.data) {
+                    var tmp_index = resp.data[index]
+                    for (var country in tmp_index.data) {
+                        var tmp_country = tmp_index.data[country]
+						for (var data in tmp_country.data){
+                            var tmp_data = tmp_country.data[data]
+								var line = [tmp_country.country.name, tmp_index.index.name]
+								var offset = parseInt(tmp_data.time.substr(0,4)) - query_args.start_time + 2
+								line[offset] = tmp_data.value
+						}
+                        local_data.push(line)
+					}
+                }
+                console.log()
+            }
+        });
+
+    }()
+
+	console.log(data_fields,data_columns)
+
+    var data_source = {
+        localdata: local_data,
+        datafields: data_fields,
+        datatype: 'array'
+    };
+    var data_adapter = new $.jqx.dataAdapter(data_source);
+
+    $('#cat_expander').jqxExpander({
 		width: '250px', height: '400px', showArrow: false, toggleMode: 'none', theme: '<%=jqx_theme %>'
 	});
 	
 	$('#cat_tree').jqxTree({
-		source: cat_tree_src, width: '100%', height: '100%', theme: '<%=jqx_theme %>'
+		source: table_data, width: '100%', height: '100%', theme: '<%=jqx_theme %>'
 	});
 	
 	$('#location_expander').jqxExpander({
@@ -36,8 +154,9 @@ $(document).ready(function() {
 	});
 	
 	$('#location_list').jqxDropDownList({
-		source: ['<fmt:message key="common.country.brazil" />', '<fmt:message key="common.country.russia" />', '<fmt:message key="common.country.india" />', '<fmt:message key="common.country.china" />', '<fmt:message key="common.country.south_africa" />', '<fmt:message key="common.country.brics" />', '<fmt:message key="common.country.world" />'], checkboxes: true,
-		width: '100%', theme: '<%=jqx_theme %>'
+		source: country_data, checkboxes: true,
+		width: '100%', theme: '<%=jqx_theme %>',
+        displayMember:"name",valueMember:"id"
 	});
 	
 	$("#location_list").jqxDropDownList('checkIndex', 0);
@@ -53,15 +172,16 @@ $(document).ready(function() {
 	});
 	
 	$('#variable_list').jqxDropDownList({
-		source: ['<fmt:message key="common.indicator.population" />', '<fmt:message key="common.indicator.male" />', '<fmt:message key="common.indicator.female" />', '<fmt:message key="common.indicator.uban_population" />', '<fmt:message key="common.indicator.rural_population" />'], checkboxes: true,
-		width: '100%', theme: '<%=jqx_theme %>'
+		source: index_data, checkboxes: true,
+		width: '100%', theme: '<%=jqx_theme %>',
+        displayMember:"label",valueMember:"value"
 	});
 	
-	$("#variable_list").jqxDropDownList('checkIndex', 0);
-	$("#variable_list").jqxDropDownList('checkIndex', 1);
-	$("#variable_list").jqxDropDownList('checkIndex', 2);
-	$("#variable_list").jqxDropDownList('checkIndex', 3);
-	$("#variable_list").jqxDropDownList('checkIndex', 4);
+	// $("#variable_list").jqxDropDownList('checkIndex', 0);
+	// $("#variable_list").jqxDropDownList('checkIndex', 1);
+	// $("#variable_list").jqxDropDownList('checkIndex', 2);
+	// $("#variable_list").jqxDropDownList('checkIndex', 3);
+	// $("#variable_list").jqxDropDownList('checkIndex', 4);
 	
 	$('#time_slider').jqxSlider({
 		width: '220px', values: [2005, 2010], min: 2000, max: 2016, mode: 'fixed',
@@ -93,73 +213,65 @@ $(document).ready(function() {
 		width: '100px', height: '47px', theme: '<%=jqx_theme %>'
 	});
 	
-	var local_data = [
-		['<fmt:message key="common.country.brazil" />', '<fmt:message key="common.indicator.population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 18848 , 19070 , 19278 , 19477 , 19670 , 19861 ],
-		['<fmt:message key="common.country.russia" />', '<fmt:message key="common.indicator.population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 14362 , 14334 , 14318 , 14312 , 14313 , 14316 ],
-		['<fmt:message key="common.country.india" />', '<fmt:message key="common.indicator.population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 114433 , 116209 , 117969 , 119707 , 121418 , 123098 ],
-		['<fmt:message key="common.country.china" />', '<fmt:message key="common.indicator.population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 133562 , 134277 , 134994 , 135715 , 136441 , 137170 ],
-		['<fmt:message key="common.country.south_africa" />', '<fmt:message key="common.indicator.population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 4835 , 4903 , 4969 , 5035 , 5099 , 5162 ],
-		['<fmt:message key="common.country.brics" />', '<fmt:message key="common.indicator.population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 286040 , 288792 , 291528 , 294246 , 296941 , 299608 ],
-		['<fmt:message key="common.country.world" />', '<fmt:message key="common.indicator.population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 651964 , 660022 , 668161 , 676373 , 684648 , 692973 ],
-		['<fmt:message key="common.country.brazil" />', '<fmt:message key="common.indicator.male" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 9300 , 9406 , 9506 , 9601 , 9692 , 9783 ],
-		['<fmt:message key="common.country.russia" />', '<fmt:message key="common.indicator.male" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 6684 , 6664 , 6650 , 6643 , 6639 , 6639 ],
-		['<fmt:message key="common.country.india" />', '<fmt:message key="common.indicator.male" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 59310 , 60239 , 61160 , 62069 , 62962 , 63835 ],
-		['<fmt:message key="common.country.china" />', '<fmt:message key="common.indicator.male" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 68644 , 69022 , 69400 , 69779 , 70161 , 70546 ],
-		['<fmt:message key="common.country.south_africa" />', '<fmt:message key="common.indicator.male" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 2374 , 2407 , 2438 , 2470 , 2501 , 2532 ],
-		['<fmt:message key="common.country.brics" />', '<fmt:message key="common.indicator.male" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 146313 , 147738 , 149155 , 150561 , 151955 , 153336 ],
-		['<fmt:message key="common.country.world" />', '<fmt:message key="common.indicator.male" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 328508 , 332618 , 336766 , 340947 , 345159 , 349396 ],
-		['<fmt:message key="common.country.brazil" />', '<fmt:message key="common.indicator.female" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 9548 , 9663 , 9772 , 9876 , 9978 , 10078 ],
-		['<fmt:message key="common.country.russia" />', '<fmt:message key="common.indicator.female" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 7679 , 7670 , 7668 , 7670 , 7673 , 7677 ],
-		['<fmt:message key="common.country.india" />', '<fmt:message key="common.indicator.female" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 55122 , 55969 , 56808 , 57638 , 58456 , 59263 ],
-		['<fmt:message key="common.country.china" />', '<fmt:message key="common.indicator.female" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 64917 , 65254 , 65594 , 65936 , 66280 , 66624 ],
-		['<fmt:message key="common.country.south_africa" />', '<fmt:message key="common.indicator.female" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 2461 , 2496 , 2531 , 2565 , 2598 , 2630 ],
-		['<fmt:message key="common.country.brics" />', '<fmt:message key="common.indicator.female" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 139727 , 141054 , 142374 , 143685 , 144985 , 146272 ],
-		['<fmt:message key="common.country.world" />', '<fmt:message key="common.indicator.female" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 323455 , 327404 , 331395 , 335426 , 339489 , 343577 ],
-		['<fmt:message key="common.country.brazil" />', '<fmt:message key="common.indicator.uban_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 15419 , 15642 , 15855 , 16060 , 16262 , 16463 ],
-		['<fmt:message key="common.country.russia" />', '<fmt:message key="common.indicator.uban_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 10574 , 10564 , 10566 , 10574 , 10582 , 10583 ],
-		['<fmt:message key="common.country.india" />', '<fmt:message key="common.indicator.uban_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 32952 , 33806 , 34664 , 35529 , 36402 , 37290 ],
-		['<fmt:message key="common.country.china" />', '<fmt:message key="common.indicator.uban_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 58431 , 60577 , 62734 , 64934 , 67163 , 69426 ],
-		['<fmt:message key="common.country.south_africa" />', '<fmt:message key="common.indicator.uban_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 2872 , 2939 , 3007 , 3074 , 3139 , 3201 ],
-		['<fmt:message key="common.country.brics" />', '<fmt:message key="common.indicator.uban_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 120247 , 123528 , 126826 , 130171 , 133549 , 136963 ],
-		['<fmt:message key="common.country.world" />', '<fmt:message key="common.indicator.uban_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 319901 , 327140 , 334475 , 341942 , 349494 , 357127 ],
-		['<fmt:message key="common.country.brazil" />', '<fmt:message key="common.indicator.rural_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 3195 , 3171 , 3145 , 3117 , 3087 , 3058 ],
-		['<fmt:message key="common.country.russia" />', '<fmt:message key="common.indicator.rural_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 3820 , 3807 , 3799 , 3793 , 3787 , 3779 ],
-		['<fmt:message key="common.country.india" />', '<fmt:message key="common.indicator.rural_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 79763 , 80523 , 81245 , 81938 , 82611 , 83272 ],
-		['<fmt:message key="common.country.china" />', '<fmt:message key="common.indicator.rural_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 76396 , 75061 , 73737 , 72388 , 71022 , 69629 ],
-		['<fmt:message key="common.country.south_africa" />', '<fmt:message key="common.indicator.rural_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 1952 , 1953 , 1954 , 1953 , 1950 , 1944 ],
-		['<fmt:message key="common.country.brics" />', '<fmt:message key="common.indicator.rural_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 165125 , 164515 , 163879 , 163188 , 162458 , 161683 ],
-		['<fmt:message key="common.country.world" />', '<fmt:message key="common.indicator.rural_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 331508 , 332183 , 332835 , 333423 , 333978 , 334491 ],
-	                   ];
-	var data_fields = [
-	                   {name: 'location', type: 'string', map: '0'},
-	                   {name: 'variable', type: 'string', map: '1'},
-	                   {name: 'y2005', type: 'number', map: '2'},
-	                   {name: 'y2006', type: 'number', map: '3'},
-	                   {name: 'y2007', type: 'number', map: '4'},
-	                   {name: 'y2008', type: 'number', map: '5'},
-	                   {name: 'y2009', type: 'number', map: '6'},
-	                   {name: 'y2010', type: 'number', map: '7'}
-	                   ];
-	var data_columns = [
-	                   {text: '<fmt:message key="common.dimension.country" />', datafield: 'location', width: 70},
-	                   {text: '<fmt:message key="common.dimension.indicator" />', datafield: 'variable', width: 100},
-	                   {text: '2005', datafield: 'y2005', width: 70, cellsalign: 'right'},
-	                   {text: '2006', datafield: 'y2006', width: 70, cellsalign: 'right'},
-	                   {text: '2007', datafield: 'y2007', width: 70, cellsalign: 'right'},
-	                   {text: '2008', datafield: 'y2008', width: 70, cellsalign: 'right'},
-	                   {text: '2009', datafield: 'y2009', width: 70, cellsalign: 'right'},
-	                   {text: '2010', datafield: 'y2010', width: 70, cellsalign: 'right'}
-	               ];
-	var data_source = {
-			localdata: local_data,
-			datafields: data_fields,
-			datatype: 'array'
-	};
-	var data_adapter = new $.jqx.dataAdapter(data_source);
+
 	$('#data_grid').jqxGrid({
 		width: '650px', height: '270px', source: data_adapter, columnsresize: true,
 		columns: data_columns, theme: '<%=jqx_theme %>'
 	});
+
+    // 处理事件
+    $('#cat_tree').on('select',function (event)
+    {
+        var args = event.args;
+        var item = $('#cat_tree').jqxTree('getItem', args.element);
+
+        query_args.table_id=item.value
+        index_data.splice(0,index_data.length);
+        query_args.index_ids=[]
+        for (var i in table_index_data[item.id]) {
+            index_data.push({label:table_index_data[item.id][i].name, value:table_index_data[item.id][i].id, id:table_index_data[item.id][i].id})
+        }
+        console.log('qu', query_args)
+        $("#variable_list").jqxDropDownList('render');
+    });
+
+    $('#variable_list').on('select', function (event) {
+        var args = event.args;
+        console.log(args)
+        var item = $('#variable_list').jqxDropDownList('getItem', args.index);
+        if (item.checked === true) {
+            query_args.index_ids.push(item.value)
+        }
+        else {
+            removeByValue(query_args.index_ids,item.value)
+        }
+        console.log('qu', query_args)
+    })
+
+
+    $('#location_list').on('select', function (event) {
+        var args = event.args;
+        var item = $('#location_list').jqxDropDownList('getItem', args.index);
+        if (item.checked === true) {
+            query_args.country_ids.push(item.id)
+        }
+        else {
+            removeByValue(query_args.country_ids,item.id)
+        }
+        console.log('qu', query_args)
+    })
+    // var values = $('#time_slider').jqxSlider('values');
+    // query_args.start_time = values[0].toString();
+    // query_args.end_time = values[1].toString();
+
+    // $('#time_slider').on('change', function (event) {
+    //     var values = $('#time_slider').jqxSlider('values');
+    //     query_args.start_time = values[0]
+    //     query_args.end_time = values[1]
+    //     console.log('qu', query_args)
+    // });
+
+    $('#cat_tree').jqxTree('selectItem',$("#cat_tree").find('li:first')[0])
 	
 });
 

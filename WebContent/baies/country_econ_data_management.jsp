@@ -25,11 +25,19 @@ String jqx_theme = (String)request.getSession().getAttribute("jqx_theme");
         }
     };
 
+    var parseParam=function(param){
+        var paramStr="";
+        for (var key in param) {
+            paramStr = paramStr+ "&"+ key + '=' + JSON.stringify(param[key])
+        }
+        return paramStr.substr(1);
+    };
+
     var table_index_data= {};
     var table_data = [];
     var country_data = [];
     var index_data = [];
-    var query_args = { country_ids:[], table_id:'', index_ids:[], start_time:'', end_time:''};
+    var query_args = { country_ids:[], table_id:0, index_ids:[], start_time:'', end_time:''};
 
 
 
@@ -117,7 +125,7 @@ String jqx_theme = (String)request.getSession().getAttribute("jqx_theme");
         });
 
         $('#query_button').on('click', function() {
-            window.location.href='country_econ_data_management_table.jsp';
+            window.location.href='country_econ_data_management_table.jsp'+'?'+ parseParam(query_args);
         });
 
         // 处理事件
@@ -126,7 +134,7 @@ String jqx_theme = (String)request.getSession().getAttribute("jqx_theme");
             var args = event.args;
             var item = $('#cat_tree').jqxTree('getItem', args.element);
 
-            query_args.table_id=item.id
+            query_args.table_id=item.value
             index_data.splice(0,index_data.length);
             query_args.index_ids=[]
             for (var i in table_index_data[item.id]) {
@@ -163,8 +171,8 @@ String jqx_theme = (String)request.getSession().getAttribute("jqx_theme");
             console.log('qu', query_args)
         })
         var values = $('#time_slider').jqxSlider('values');
-        query_args.start_time = values[0]
-        query_args.end_time = values[1]
+        query_args.start_time = values[0];
+        query_args.end_time = values[1];
 
         $('#time_slider').on('change', function (event) {
             var values = $('#time_slider').jqxSlider('values');
