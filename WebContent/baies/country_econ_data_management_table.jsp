@@ -197,8 +197,8 @@ $(document).ready(function() {
     var local_data = [
     ];
     var data_fields = [
-        {name: 'location', type: 'string', map: '0'},
-        {name: 'variable', type: 'string', map: '1'}
+        {name: 'location', type: 'string', map: 'location'},
+        {name: 'variable', type: 'string', map: 'variable'}
     ];
     var data_columns = [
         {text: '<fmt:message key="common.dimension.country" />', datafield: 'location', width: 70},
@@ -206,10 +206,12 @@ $(document).ready(function() {
 
     var tmp = function init_data_columns () {
         for (var year = query_args.start_time;year<=query_args.end_time; year++){
-            data_fields.push({name: 'y'+year, type: 'number', map: (year - query_args.start_time + 2).toString()} );
+            data_fields.push({name: 'y'+year, type: 'object', map: 'y'+year.toString()+'>value'} );
+            data_fields.push({name: 'y'+year+'_id', type: 'object', map: 'y'+year.toString()+'>id'} );
             data_columns.push({text: year.toString(), datafield: 'y'+year, width: 70, cellsalign: 'right'})
             console.log('fill',year)
         }
+        console.log(data_fields,data_columns)
         $.ajax({
             type:'GET',
             url:'http://127.0.0.1:5000/quantify/socioeconomic_facts'+location.search,
@@ -223,18 +225,18 @@ $(document).ready(function() {
                         var tmp_country = tmp_index.data[country]
                         for (var data in tmp_country.data){
                             var tmp_data = tmp_country.data[data]
-                            var line = [tmp_country.country.name, tmp_index.index.name]
-                            var offset = parseInt(tmp_data.time.substr(0,4)) - query_args.start_time + 2
-                            line[offset] = tmp_data.value
+                            var line = {location:tmp_country.country.name,variable: tmp_index.index.name}
+                            line['y'+tmp_data.time.substr(0,4)] = {value:tmp_data.value, id:tmp_data.id}
                         }
                         local_data.push(line)
                     }
                 }
-                console.log()
+                console.log(local_data)
             }
         });
 
     }()
+
 
 	var data_source = {
 			localdata: local_data,
@@ -254,6 +256,7 @@ $(document).ready(function() {
 		var datafield = args.datafield;
 		var value = args.value;
 		var oldvalue = args.oldvalue;
+		console.log(args)
 		if(value == oldvalue) {
 			return;
 		}
