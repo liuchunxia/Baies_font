@@ -48,7 +48,7 @@ $(document).ready(function() {
 			             {name: 'status', type: 'string'},
 			             {name: 'operation', type: 'string'}],
 	};
-	var dataAdapter = new $.jqx.dataAdapter(source);
+	var dataAdapter = new $.jqx.DedataAdapter(source);
 	var settings = {
 			width: '850px',
 			source: dataAdapter,

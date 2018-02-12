@@ -23,28 +23,65 @@ $(document).ready(function() {
 	
 	var rows = $("#user_ul");
 	var data = [];
-	for (var i = 0; i < 100; i++) {
-		var row = rows[0];
-		var datarow = {};
-		datarow['id'] = i + 1;
-		datarow['name'] = 'user' + (Math.floor(Math.random()*1000)+1);
-		datarow['real_name'] = $(row).find('li:nth-child(3)').find('span:nth-child('+(Math.floor(Math.random()*4)+1)+')').html();
-		datarow['country'] = $(row).find('li:nth-child(4)').find('span:nth-child('+(Math.floor(Math.random()*5)+1)+')').html();
-		datarow['create_time'] = $(row).find('li:nth-child(5)').html();
-		datarow['last_login_time'] = $(row).find('li:nth-child(6)').html();
-		datarow['role'] = $(row).find('li:nth-child(7)').find('span:nth-child('+(Math.floor(Math.random()*3)+1)+')').html();
-		datarow['operation'] = $(row).find('li:nth-child(8)').html();
-		data[data.length] = datarow;
-	}
+	var role_data = [];
+	// for (var i = 0; i < 100; i++) {
+	// 	var row = rows[0];
+	// 	var datarow = {};
+	// 	datarow['id'] = i + 1;
+	// 	datarow['name'] = 'user' + (Math.floor(Math.random()*1000)+1);
+	// 	datarow['real_name'] = $(row).find('li:nth-child(3)').find('span:nth-child('+(Math.floor(Math.random()*4)+1)+')').html();
+	// 	datarow['country'] = $(row).find('li:nth-child(4)').find('span:nth-child('+(Math.floor(Math.random()*5)+1)+')').html();
+	// 	datarow['create_time'] = $(row).find('li:nth-child(5)').html();
+	// 	datarow['last_login_time'] = $(row).find('li:nth-child(6)').html();
+	// 	datarow['role'] = $(row).find('li:nth-child(7)').find('span:nth-child('+(Math.floor(Math.random()*3)+1)+')').html();
+	// 	datarow['operation'] = $(row).find('li:nth-child(8)').html();
+	// 	data[data.length] = datarow;
+	// }
+
+
+
+    $.ajax({
+        type:'GET',
+        url:'http://127.0.0.1:5000/user/User',
+        data: {},
+        withCredentials: true,
+		async: false,
+        success: function (resp) {
+            for (var index in resp.data) {
+                var row = rows[0];
+                var datarow = {}
+                datarow['id'] = resp.data[index].id
+                datarow['email'] = resp.data[index].email
+                datarow['country'] = resp.data[index].country
+				datarow['name'] = resp.data[index].username
+				datarow['role'] = resp.data[index].role.name
+				datarow['operation'] = $(row).find('li:nth-child(8)').html()
+                data[data.length] = datarow;
+            }
+		}
+    });
+    $.ajax({
+        type:'GET',
+        url:'http://127.0.0.1:5000/user/Role',
+        data: {},
+        async: false,
+        withCredentials: true,
+        success: function (resp) {
+            for (var index in resp.data) {
+                role_data.push({label:resp.data[index].name, value: resp.data[index].id})
+            }
+            console.log('role_data', role_data)
+        }
+    })
 	var source = {
 			localdata: data,
 			datatype: 'array',
 			datafields: [{name: 'id', type: 'number'},
 			             {name: 'name', type: 'string'},
-			             {name: 'real_name', type: 'string'},
+			             {name: 'email', type: 'string'},
 			             {name: 'country', type: 'string'},
-			             {name: 'create_time', type: 'string'},
-			             {name: 'last_login_time', type: 'string'},
+			             // {name: 'create_time', type: 'string'},
+			             // {name: 'last_login_time', type: 'string'},
 			             {name: 'role', type: 'string'},
 			             {name: 'operation', type: 'string'}],
 	};
@@ -60,10 +97,10 @@ $(document).ready(function() {
 			theme: '<%=jqx_theme %>',
 			columns: [{text: '编号', dataField: 'id', width: 100, align: 'center', cellsalign: 'center'},
 			          {text: '登录名', dataField: 'name', width: 150, align: 'center', cellsalign: 'center'},
-			          {text: '姓名', dataField: 'real_name', width: 100, align: 'center', cellsalign: 'center'},
+			          {text: '邮箱', dataField: 'real_name', width: 100, align: 'center', cellsalign: 'center'},
 			          {text: '<fmt:message key="common.dimension.country" />', dataField: 'country', width: 100, align: 'center', cellsalign: 'center'},
-			          {text: '创建时间', dataField: 'create_time', width: 100, align: 'center', cellsalign: 'center'},
-			          {text: '最后登录时间', dataField: 'last_login_time', width: 100, align: 'center', cellsalign: 'center'},
+			          // {text: '创建时间', dataField: 'create_time', width: 100, align: 'center', cellsalign: 'center'},
+			          // {text: '最后登录时间', dataField: 'last_login_time', width: 100, align: 'center', cellsalign: 'center'},
 			          {text: '角色', dataField: 'role', width: 100, align: 'center', cellsalign: 'center'},
 			          {text: '操作', dataField: 'operation', width: 100, align: 'center', cellsalign: 'center'}
 			          ],
@@ -77,6 +114,40 @@ $(document).ready(function() {
 					$('#edit_title_input').val('');
 					$('#edit_content_editor').val('');
 					$('#edit_window').jqxWindow('open');
+
+					$('#edit_window_ok_button').one('click', function (event) {
+                        console.log("add");
+					    var post_data = {
+                            email: "",
+                            username: "",
+                            country: "",
+                            role_id: "",
+							password:""
+						};
+
+					    post_data.email = $('#email_input').val();
+						post_data.username = $('#name_input').val();
+						post_data.country = $('#country_input').val();
+						post_data.role_id = $('#role_input').val();
+						post_data.password = $('#password_input').val();
+
+						console.log("add user", post_data);
+
+                        $.ajax({
+                            type:'POST',
+                            url:'http://127.0.0.1:5000/user/User',
+                            data: post_data,
+                            async: true,
+                            withCredentials: true,
+                            success: function (resp) {
+                                if (resp.status === "success")
+								{
+								    window.location.reload()
+								}
+                            }
+                        })
+
+                    })
 				});
 			}
 	};
@@ -93,12 +164,59 @@ $(document).ready(function() {
 	$("#dialog_window_cancel_button").jqxButton({
 		theme: '<%=jqx_theme %>'
 	});
-	
-	$('.edit_buttons').on('click', function() {
-		$('#edit_title_input').val('<fmt:message key="temp.policy_title" />');
-		$('#edit_content_editor').val($('<div />').html($('#editor_content').html()).text());
-		$('#edit_window').jqxWindow('open');
-	});
+
+    $("#user_grid").on("cellclick", function (event)
+    {
+        // event arguments.
+        var args = event.args;
+
+        var user = args.row.bounddata;
+        console.log(args)
+
+        $('.edit_buttons').one('click', function() {
+            $('#edit_title_input').val('<fmt:message key="temp.policy_title" />');
+            $('#edit_content_editor').val($('<div />').html($('#editor_content').html()).text());
+            $('#edit_window').jqxWindow('open');
+
+
+            $('#edit_window_ok_button').one('click', function (event) {
+                console.log(user)
+                var post_data = {
+                    email: "",
+                    username: "",
+                    country: "",
+                    role_id: "",
+                    password:""
+                };
+
+                post_data.email = $('#email_input').val();
+                post_data.username = $('#name_input').val();
+                post_data.country = $('#country_input').val();
+                post_data.role_id = $('#role_input').val();
+                post_data.password = $('#password_input').val();
+
+                console.log("change user", post_data)
+
+                $.ajax({
+                    type:'PUT',
+                    url:'http://127.0.0.1:5000/user/User/'+user.id,
+                    data: post_data,
+                    async: true,
+                    withCredentials: true,
+                    success: function (resp) {
+                        if (resp.status === "success")
+                        {
+                            window.location.reload()
+                        }
+                    }
+                })
+
+            }.bind(this))
+
+        }.bind(this));
+    });
+
+
 	
 	$('.delete_buttons').on('click', function() {
 		$('#dialog_window_content').html('是否删除用户？');
@@ -133,6 +251,8 @@ $(document).ready(function() {
 	$('#message_notification').jqxNotification({
 		width: 'auto', position: "bottom-right", opacity: 0.9, template: 'success', theme: '<%=jqx_theme %>'
 	});
+
+    $("#role_input").jqxDropDownList({ source: role_data, displayMember: "label", valueMember: "value" , width: '200px', height: '15px'});
 
 });
 
@@ -190,35 +310,26 @@ $(document).ready(function() {
 				<td><input type="text" id="name_input" style="width: 200px;"></td>
 			</tr>
 			<tr>
-				<td>姓名:</td>
-				<td><input type="text" id="real_name_input" style="width: 200px;"></td>
+				<td>邮箱:</td>
+				<td><input type="text" id="email_input" style="width: 200px;"></td>
 			</tr>
 			<tr>
 				<td><fmt:message key="common.dimension.country" />:</td>
-				<td>
-					<select style="width: 200px;">
-						<option>--请选择--</option>
-						<option><fmt:message key="common.country.brazil" /></option>
-						<option><fmt:message key="common.country.russia" /></option>
-						<option><fmt:message key="common.country.india" /></option>
-						<option><fmt:message key="common.country.china" /></option>
-						<option><fmt:message key="common.country.south_africa" /></option>
-					</select>
-				</td>
+				<td><input type="text" id="country_input" style="width: 200px;"></td>
 			</tr>
 			<tr>
 				<td>角色:</td>
-				<td>
-					<select style="width: 200px;">
-						<option>--请选择--</option>
-						<option>查询用户</option>
-						<option><fmt:message key="common.dimension.country" />管理员</option>
-						<option>系统管理员</option>
-					</select>
+				<td id="role_input">
+				</td>
+			</tr>
+
+			<tr>
+				<td>密码:</td>
+				<td><input type="password" id="password_input" style="width: 200px;"></td>
 				</td>
 			</tr>
 		</table>
-		<div class="right margin_10">
+		<div class="right margin_10" id="operator_column">
 			<input type="button" id="edit_window_ok_button" value="保存">
 			<input type="button" id="edit_window_cancel_button" value="取消">
 		</div>
