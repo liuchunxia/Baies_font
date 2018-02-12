@@ -148,6 +148,8 @@ $(document).ready(function() {
                         })
 
                     })
+
+
 				});
 			}
 	};
@@ -201,6 +203,29 @@ $(document).ready(function() {
                     type:'PUT',
                     url:'http://127.0.0.1:5000/user/User/'+user.id,
                     data: post_data,
+                    async: true,
+                    withCredentials: true,
+                    success: function (resp) {
+                        if (resp.status === "success")
+                        {
+                            window.location.reload()
+                        }
+                    }
+                })
+
+            }.bind(this))
+
+        }.bind(this));
+
+
+        $('.delete_buttons').one('click', function() {
+            console.log("delete use ", user)
+            $('#dialog_window_ok_button').one('click', function (event) {
+				console.log("delete use ok", user)
+                $.ajax({
+                    type:'DELETE',
+                    url:'http://127.0.0.1:5000/user/User/'+user.id,
+                    data: {},
                     async: true,
                     withCredentials: true,
                     success: function (resp) {

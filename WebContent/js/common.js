@@ -22,6 +22,7 @@ function formatCurrentDate(fmt) {
 	}
 }
 
+
 nav_items = [ "../baies/index.jsp", "../baies/policy.jsp",
 		"../baies/econ_data.jsp", "../baies/agri_data.jsp" ];
 

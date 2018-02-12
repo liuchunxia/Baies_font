@@ -24,45 +24,95 @@ $(document).ready(function() {
 	$('#cat_tabs').jqxTabs({width: '998px', position: 'top', theme: '<%=jqx_theme %>'});
 	
 	var rows = $("#news_ul");
-	var data = [];
-	for (var i = 0; i < 100; i++) {
-		var row = rows[0];
-		var datarow = {};
-		datarow['picture'] = $(row).find('li:nth-child(1)').html();
-		datarow['title'] = $(row).find('li:nth-child(2)').html();
-		datarow['author'] = $(row).find('li:nth-child(3)').html();
-		datarow['create_time'] = $(row).find('li:nth-child(4)').html();
-		datarow['modify_time'] = $(row).find('li:nth-child(5)').html();
-		datarow['status'] = $(row).find('li:nth-child(6)').find('span:nth-child('+(Math.floor(Math.random()*3)+1)+')').html();
-		datarow['operation'] = $(row).find('li:nth-child(7)').html();
-		data[data.length] = datarow;
-	}
-	var source = {
-			localdata: data,
+	var data_kind_1 = [];
+	var data_kind_2 = [];
+	var data_kind_3 = [];
+	var data_kind_4 = [];
+	// for (var i = 0; i < 100; i++) {
+	// 	var row = rows[0];
+	// 	var datarow = {};
+	// 	datarow['picture'] = $(row).find('li:nth-child(1)').html();
+	// 	datarow['title'] = $(row).find('li:nth-child(2)').html();
+	// 	datarow['author'] = $(row).find('li:nth-child(3)').html();
+	// 	datarow['create_time'] = $(row).find('li:nth-child(4)').html();
+	// 	datarow['modify_time'] = $(row).find('li:nth-child(5)').html();
+	// 	datarow['status'] = $(row).find('li:nth-child(6)').find('span:nth-child('+(Math.floor(Math.random()*3)+1)+')').html();
+	// 	datarow['operation'] = $(row).find('li:nth-child(7)').html();
+	// 	data[data.length] = datarow;
+	// }
+
+    $.ajax({
+        type:'GET',
+        url:'http://127.0.0.1:5000/qualitative/Post',
+        data: {},
+        withCredentials: true,
+        async: false,
+        success: function (resp) {
+            for (var index in resp.data) {
+                var row = rows[0];
+                var datarow = {}
+				datarow['id'] = resp.data[index].id
+				datarow['title'] = resp.data[index].title
+				datarow['author'] = resp.data[index].user.username
+				datarow['create_time'] = resp.data[index].timestamp
+				datarow['status'] = resp.data[index].show
+				datarow['operation'] = $(row).find('li:nth-child(7)').html();
+				datarow['body'] = resp.data[index].body
+				datarow['kind_id'] = resp.data[index].kind_id
+
+                switch(datarow['kind_id'])
+                {
+                    case 1:
+                        data_kind_1[data_kind_1.length] = datarow;
+                        break;
+                    case 2:
+                        data_kind_2[data_kind_2.length] = datarow;
+                        break;
+                    case 3:
+                        data_kind_3[data_kind_3.length] = datarow;
+                        break;
+                    case 4:
+                        data_kind_4[data_kind_4.length] = datarow;
+                        break;
+					default:
+					    break;
+                }
+
+
+            }
+        }
+    });
+
+	var source_kind_1 = {
+			localdata: data_kind_1,
 			datatype: 'array',
-			datafields: [{name: 'picture', type: 'string'},
+			datafields: [{name:'id', type:'number'},
+			    		 {name: 'picture', type: 'string'},
 			             {name: 'title', type: 'string'},
 			             {name: 'author', type: 'string'},
 			             {name: 'create_time', type: 'string'},
-			             {name: 'modify_time', type: 'string'},
 			             {name: 'status', type: 'string'},
-			             {name: 'operation', type: 'string'}],
+			             {name: 'operation', type: 'string'},
+				         {name: 'body', type:'string'},
+				         {name: 'kind_id', type:'string'}]
 	};
-	var dataAdapter = new $.jqx.DedataAdapter(source);
-	var settings = {
+
+	var dataAdapter_kind_1 = new $.jqx.dataAdapter(source_kind_1);
+	var settings_kind_1 = {
 			width: '850px',
-			source: dataAdapter,
+			source: dataAdapter_kind_1,
 			autoheight: true,
 			autorowheight: true,
 			showheader: true,
 			pageable: true,
 			pagesize: 10,
 			theme: '<%=jqx_theme %>',
-			columns: [{text: '', dataField: 'picture', width: 65, align: 'center'},
+			columns: [
+			    // {text: '', dataField: 'picture', width: 65, align: 'center'},
 			          {text: '标题', dataField: 'title', width: 345, align: 'center'},
 			          {text: '<fmt:message key="text.author" />', dataField: 'author', width: 80, align: 'center', cellsalign: 'center'},
 			          {text: '创建时间', dataField: 'create_time', width: 100, align: 'center', cellsalign: 'center'},
-			          {text: '修改时间', dataField: 'modify_time', width: 100, align: 'center', cellsalign: 'center'},
+			          // {text: '修改时间', dataField: 'modify_time', width: 100, align: 'center', cellsalign: 'center'},
 			          {text: '审核状态', dataField: 'status', width: 80, align: 'center', cellsalign: 'center'},
 			          {text: '操作', dataField: 'operation', width: 80, align: 'center', cellsalign: 'center'}
 			          ],
@@ -90,21 +140,221 @@ $(document).ready(function() {
                             withCredentials: true,
                             async: false,
                             success: function (resp) {
-                                if(event.args.dialogResult.OK) {
                                     $('#message_notification_content').html('信息已保存。');
                                     $('#message_notification').jqxNotification('open');
                                     window.location.reload();
-                                }
                             }
                         })
                     });
 				});
 			}
 	};
-	$('#news_grid_1').jqxGrid(settings);
-	$('#news_grid_2').jqxGrid(settings);
-	$('#news_grid_3').jqxGrid(settings);
-	$('#news_grid_4').jqxGrid(settings);
+
+    var source_kind_2 = {
+        localdata: data_kind_2,
+        datatype: 'array',
+        datafields: [{name:'id', type:'number'},
+            {name: 'picture', type: 'string'},
+            {name: 'title', type: 'string'},
+            {name: 'author', type: 'string'},
+            {name: 'create_time', type: 'string'},
+            {name: 'status', type: 'string'},
+            {name: 'operation', type: 'string'},
+            {name: 'body', type:'string'},
+            {name: 'kind_id', type:'string'}]
+    };
+
+    var dataAdapter_kind_2 = new $.jqx.dataAdapter(source_kind_2);
+    var settings_kind_2 = {
+        width: '850px',
+        source: dataAdapter_kind_2,
+        autoheight: true,
+        autorowheight: true,
+        showheader: true,
+        pageable: true,
+        pagesize: 10,
+        theme: '<%=jqx_theme %>',
+        columns: [
+            // {text: '', dataField: 'picture', width: 65, align: 'center'},
+            {text: '标题', dataField: 'title', width: 345, align: 'center'},
+            {text: '<fmt:message key="text.author" />', dataField: 'author', width: 80, align: 'center', cellsalign: 'center'},
+            {text: '创建时间', dataField: 'create_time', width: 100, align: 'center', cellsalign: 'center'},
+            // {text: '修改时间', dataField: 'modify_time', width: 100, align: 'center', cellsalign: 'center'},
+            {text: '审核状态', dataField: 'status', width: 80, align: 'center', cellsalign: 'center'},
+            {text: '操作', dataField: 'operation', width: 80, align: 'center', cellsalign: 'center'}
+        ],
+        showtoolbar: true,
+        rendertoolbar: function(toolbar) {
+            var container = $('<div style="margin: 5px 10px 5px 5px; text-align: right;"></div>');
+            toolbar.append(container);
+            container.append('<input id="addrowbutton2" type="button" value="新建信息" />');
+            $("#addrowbutton2").jqxButton();
+            $("#addrowbutton2").on('click', function () {
+                $('#edit_title_input').val('');
+                $('#edit_content_editor').val('');
+                $('#edit_window').jqxWindow('open');
+                $("#edit_window_ok_button").one('click', function(event) {
+                    var post_data = {title:"", body:"", kind_id:""}
+
+                    post_data.title = $('#edit_title_input').val();
+                    post_data.body = $('#edit_content_editor').val();
+                    post_data.kind_id = 2
+                    console.log("add a post", post_data)
+                    $.ajax({
+                        type:'POST',
+                        url:'http://127.0.0.1:5000/qualitative/Post',
+                        data: post_data,
+                        withCredentials: true,
+                        async: false,
+                        success: function (resp) {
+                            $('#message_notification_content').html('信息已保存。');
+                            $('#message_notification').jqxNotification('open');
+                            window.location.reload();
+                        }
+                    })
+                });
+            });
+        }
+    };
+
+    var source_kind_3 = {
+        localdata: data_kind_3,
+        datatype: 'array',
+        datafields: [{name:'id', type:'number'},
+            {name: 'picture', type: 'string'},
+            {name: 'title', type: 'string'},
+            {name: 'author', type: 'string'},
+            {name: 'create_time', type: 'string'},
+            {name: 'status', type: 'string'},
+            {name: 'operation', type: 'string'},
+            {name: 'body', type:'string'},
+            {name: 'kind_id', type:'string'}]
+    };
+
+    var dataAdapter_kind_3 = new $.jqx.dataAdapter(source_kind_3);
+    var settings_kind_3 = {
+        width: '850px',
+        source: dataAdapter_kind_3,
+        autoheight: true,
+        autorowheight: true,
+        showheader: true,
+        pageable: true,
+        pagesize: 10,
+        theme: '<%=jqx_theme %>',
+        columns: [
+            // {text: '', dataField: 'picture', width: 65, align: 'center'},
+            {text: '标题', dataField: 'title', width: 345, align: 'center'},
+            {text: '<fmt:message key="text.author" />', dataField: 'author', width: 80, align: 'center', cellsalign: 'center'},
+            {text: '创建时间', dataField: 'create_time', width: 100, align: 'center', cellsalign: 'center'},
+            // {text: '修改时间', dataField: 'modify_time', width: 100, align: 'center', cellsalign: 'center'},
+            {text: '审核状态', dataField: 'status', width: 80, align: 'center', cellsalign: 'center'},
+            {text: '操作', dataField: 'operation', width: 80, align: 'center', cellsalign: 'center'}
+        ],
+        showtoolbar: true,
+        rendertoolbar: function(toolbar) {
+            var container = $('<div style="margin: 5px 10px 5px 5px; text-align: right;"></div>');
+            toolbar.append(container);
+            container.append('<input id="addrowbutton3" type="button" value="新建信息" />');
+            $("#addrowbutton3").jqxButton();
+            $("#addrowbutton3").on('click', function () {
+                $('#edit_title_input').val('');
+                $('#edit_content_editor').val('');
+                $('#edit_window').jqxWindow('open');
+                $("#edit_window_ok_button").one('click', function(event) {
+                    var post_data = {title:"", body:"", kind_id:""}
+
+                    post_data.title = $('#edit_title_input').val();
+                    post_data.body = $('#edit_content_editor').val();
+                    post_data.kind_id = 3
+                    console.log("add a post", post_data)
+                    $.ajax({
+                        type:'POST',
+                        url:'http://127.0.0.1:5000/qualitative/Post',
+                        data: post_data,
+                        withCredentials: true,
+                        async: false,
+                        success: function (resp) {
+                            $('#message_notification_content').html('信息已保存。');
+                            $('#message_notification').jqxNotification('open');
+                            window.location.reload();
+                        }
+                    })
+                });
+            });
+        }
+    };
+
+    var source_kind_4 = {
+        localdata: data_kind_4,
+        datatype: 'array',
+        datafields: [{name:'id', type:'number'},
+            {name: 'picture', type: 'string'},
+            {name: 'title', type: 'string'},
+            {name: 'author', type: 'string'},
+            {name: 'create_time', type: 'string'},
+            {name: 'status', type: 'string'},
+            {name: 'operation', type: 'string'},
+            {name: 'body', type:'string'},
+            {name: 'kind_id', type:'string'}]
+    };
+
+    var dataAdapter_kind_4 = new $.jqx.dataAdapter(source_kind_4);
+    var settings_kind_4 = {
+        width: '850px',
+        source: dataAdapter_kind_4,
+        autoheight: true,
+        autorowheight: true,
+        showheader: true,
+        pageable: true,
+        pagesize: 10,
+        theme: '<%=jqx_theme %>',
+        columns: [
+            // {text: '', dataField: 'picture', width: 65, align: 'center'},
+            {text: '标题', dataField: 'title', width: 345, align: 'center'},
+            {text: '<fmt:message key="text.author" />', dataField: 'author', width: 80, align: 'center', cellsalign: 'center'},
+            {text: '创建时间', dataField: 'create_time', width: 100, align: 'center', cellsalign: 'center'},
+            // {text: '修改时间', dataField: 'modify_time', width: 100, align: 'center', cellsalign: 'center'},
+            {text: '审核状态', dataField: 'status', width: 80, align: 'center', cellsalign: 'center'},
+            {text: '操作', dataField: 'operation', width: 80, align: 'center', cellsalign: 'center'}
+        ],
+        showtoolbar: true,
+        rendertoolbar: function(toolbar) {
+            var container = $('<div style="margin: 5px 10px 5px 5px; text-align: right;"></div>');
+            toolbar.append(container);
+            container.append('<input id="addrowbutton4" type="button" value="新建信息" />');
+            $("#addrowbutton4").jqxButton();
+            $("#addrowbutton4").on('click', function () {
+                $('#edit_title_input').val('');
+                $('#edit_content_editor').val('');
+                $('#edit_window').jqxWindow('open');
+                $("#edit_window_ok_button").one('click', function(event) {
+                    var post_data = {title:"", body:"", kind_id:""}
+
+                    post_data.title = $('#edit_title_input').val();
+                    post_data.body = $('#edit_content_editor').val();
+                    post_data.kind_id = 4
+                    console.log("add a post", post_data)
+                    $.ajax({
+                        type:'POST',
+                        url:'http://127.0.0.1:5000/qualitative/Post',
+                        data: post_data,
+                        withCredentials: true,
+                        async: false,
+                        success: function (resp) {
+                            $('#message_notification_content').html('信息已保存。');
+                            $('#message_notification').jqxNotification('open');
+                            window.location.reload();
+                        }
+                    })
+                });
+            });
+        }
+    };
+
+	$('#news_grid_1').jqxGrid(settings_kind_1);
+	$('#news_grid_2').jqxGrid(settings_kind_2);
+	$('#news_grid_3').jqxGrid(settings_kind_3);
+	$('#news_grid_4').jqxGrid(settings_kind_4);
 	
 	$('#dialog_window').jqxWindow({
 		width: 350, height: 'auto', resizable: false,  isModal: true, autoOpen: false,
@@ -117,13 +367,7 @@ $(document).ready(function() {
 	$("#dialog_window_cancel_button").jqxButton({
 		theme: '<%=jqx_theme %>'
 	});
-	
-	$('.edit_buttons').on('click', function() {
-		$('#edit_title_input').val('<fmt:message key="temp.policy_title" />');
-		$('#edit_content_editor').val($('<div />').html($('#editor_content').html()).text());
-		$('#edit_window').jqxWindow('open');
 
-	});
 	
 	$('.delete_buttons').on('click', function() {
 		$('#dialog_window_content').html('是否删除本信息？');
@@ -163,7 +407,279 @@ $(document).ready(function() {
 	$('#message_notification').jqxNotification({
 		width: 'auto', position: "bottom-right", opacity: 0.9, template: 'success', theme: '<%=jqx_theme %>'
 	});
-	
+
+
+    $("#news_grid_1").on("cellclick", function (event)
+    {
+        // event arguments.
+        var args = event.args;
+
+        var post = args.row.bounddata;
+        console.log(args)
+
+        $('.edit_buttons').one('click', function() {
+            $('#edit_title_input').val(post.title);
+            $('#edit_content_editor').val($('<div />').html(post.body).text());
+            $('#edit_window').jqxWindow('open');
+
+            $('#edit_window_ok_button').one('click', function (event) {
+                console.log(post)
+                var post_data = {
+                    body: "",
+                    kind_id: 1,
+                    title: ""
+                };
+
+                post_data.title = $('#edit_title_input').val();
+                post_data.body = $('#edit_content_editor').val();
+
+                console.log("change user", post_data)
+
+                $.ajax({
+                    type:'PUT',
+                    url:'http://127.0.0.1:5000/qualitative/Post/'+post.id,
+                    data: post_data,
+                    async: true,
+                    withCredentials: true,
+                    success: function (resp) {
+                        if (resp.status === "success")
+                        {
+                            window.location.reload()
+                        }
+                    }
+                })
+
+            }.bind(this))
+
+        }.bind(this));
+
+
+        $('.delete_buttons').one('click', function() {
+            console.log("delete use ", post)
+            $('#dialog_window_ok_button').one('click', function (event) {
+                console.log("delete use ok", post)
+                $.ajax({
+                    type:'DELETE',
+                    url:'http://127.0.0.1:5000/qualitative/Post/'+post.id,
+                    data: {},
+                    async: true,
+                    withCredentials: true,
+                    success: function (resp) {
+                        if (resp.status === "success")
+                        {
+                            window.location.reload()
+                        }
+                    }
+                })
+
+            }.bind(this))
+
+        }.bind(this));
+    });
+
+    $("#news_grid_2").on("cellclick", function (event)
+    {
+        // event arguments.
+        var args = event.args;
+
+        var post = args.row.bounddata;
+        console.log(args)
+
+        $('.edit_buttons').one('click', function() {
+            $('#edit_title_input').val(post.title);
+            $('#edit_content_editor').val($('<div />').html(post.body).text());
+            $('#edit_window').jqxWindow('open');
+
+            $('#edit_window_ok_button').one('click', function (event) {
+                console.log(post)
+                var post_data = {
+                    body: "",
+                    kind_id: 2,
+                    title: ""
+                };
+
+                post_data.title = $('#edit_title_input').val();
+                post_data.body = $('#edit_content_editor').val();
+
+                console.log("change user", post_data)
+
+                $.ajax({
+                    type:'PUT',
+                    url:'http://127.0.0.1:5000/qualitative/Post/'+post.id,
+                    data: post_data,
+                    async: true,
+                    withCredentials: true,
+                    success: function (resp) {
+                        if (resp.status === "success")
+                        {
+                            window.location.reload()
+                        }
+                    }
+                })
+
+            }.bind(this))
+
+        }.bind(this));
+
+
+        $('.delete_buttons').one('click', function() {
+            console.log("delete use ", post)
+            $('#dialog_window_ok_button').one('click', function (event) {
+                console.log("delete use ok", post)
+                $.ajax({
+                    type:'DELETE',
+                    url:'http://127.0.0.1:5000/qualitative/Post/'+post.id,
+                    data: {},
+                    async: true,
+                    withCredentials: true,
+                    success: function (resp) {
+                        if (resp.status === "success")
+                        {
+                            window.location.reload()
+                        }
+                    }
+                })
+
+            }.bind(this))
+
+        }.bind(this));
+    });
+
+    $("#news_grid_3").on("cellclick", function (event)
+    {
+        // event arguments.
+        var args = event.args;
+
+        var post = args.row.bounddata;
+        console.log(args)
+
+        $('.edit_buttons').one('click', function() {
+            $('#edit_title_input').val(post.title);
+            $('#edit_content_editor').val($('<div />').html(post.body).text());
+            $('#edit_window').jqxWindow('open');
+
+            $('#edit_window_ok_button').one('click', function (event) {
+                console.log(post)
+                var post_data = {
+                    body: "",
+                    kind_id: 3,
+                    title: ""
+                };
+
+                post_data.title = $('#edit_title_input').val();
+                post_data.body = $('#edit_content_editor').val();
+
+                console.log("change user", post_data)
+
+                $.ajax({
+                    type:'PUT',
+                    url:'http://127.0.0.1:5000/qualitative/Post/'+post.id,
+                    data: post_data,
+                    async: true,
+                    withCredentials: true,
+                    success: function (resp) {
+                        if (resp.status === "success")
+                        {
+                            window.location.reload()
+                        }
+                    }
+                })
+
+            }.bind(this))
+
+        }.bind(this));
+
+
+        $('.delete_buttons').one('click', function() {
+            console.log("delete use ", post)
+            $('#dialog_window_ok_button').one('click', function (event) {
+                console.log("delete use ok", post)
+                $.ajax({
+                    type:'DELETE',
+                    url:'http://127.0.0.1:5000/qualitative/Post/'+post.id,
+                    data: {},
+                    async: true,
+                    withCredentials: true,
+                    success: function (resp) {
+                        if (resp.status === "success")
+                        {
+                            window.location.reload()
+                        }
+                    }
+                })
+
+            }.bind(this))
+
+        }.bind(this));
+    });
+
+    $("#news_grid_4").on("cellclick", function (event)
+    {
+        // event arguments.
+        var args = event.args;
+
+        var post = args.row.bounddata;
+        console.log(args)
+
+        $('.edit_buttons').one('click', function() {
+            $('#edit_title_input').val(post.title);
+            $('#edit_content_editor').val($('<div />').html(post.body).text());
+            $('#edit_window').jqxWindow('open');
+
+            $('#edit_window_ok_button').one('click', function (event) {
+                console.log(post)
+                var post_data = {
+                    body: "",
+                    kind_id: 4,
+                    title: ""
+                };
+
+                post_data.title = $('#edit_title_input').val();
+                post_data.body = $('#edit_content_editor').val();
+
+                console.log("change user", post_data)
+
+                $.ajax({
+                    type:'PUT',
+                    url:'http://127.0.0.1:5000/qualitative/Post/'+post.id,
+                    data: post_data,
+                    async: true,
+                    withCredentials: true,
+                    success: function (resp) {
+                        if (resp.status === "success")
+                        {
+                            window.location.reload()
+                        }
+                    }
+                })
+
+            }.bind(this))
+
+        }.bind(this));
+
+
+        $('.delete_buttons').one('click', function() {
+            console.log("delete use ", post)
+            $('#dialog_window_ok_button').one('click', function (event) {
+                console.log("delete use ok", post)
+                $.ajax({
+                    type:'DELETE',
+                    url:'http://127.0.0.1:5000/qualitative/Post/'+post.id,
+                    data: {},
+                    async: true,
+                    withCredentials: true,
+                    success: function (resp) {
+                        if (resp.status === "success")
+                        {
+                            window.location.reload()
+                        }
+                    }
+                })
+
+            }.bind(this))
+
+        }.bind(this));
+    });
 });
 
 </script>
