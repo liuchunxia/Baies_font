@@ -256,16 +256,20 @@ $(document).ready(function() {
                     var tmp_index = resp.data[index]
                     for (var country in tmp_index.data) {
                         var tmp_country = tmp_index.data[country]
+                        var line = {
+                            location: tmp_country.country.name,
+                            variable: tmp_index.index.name,
+                            country_id: tmp_country.country.id,
+                            index_id: tmp_index.index.id
+                        }
                         for (var data in tmp_country.data){
                             var tmp_data = tmp_country.data[data]
-                            var line = {
-                                location: tmp_country.country.name,
-								variable: tmp_index.index.name,
-								country_id: tmp_country.country.id,
-								index_id: tmp_index.index.id
-							}
+							console.log("tmp_data", tmp_data)
+							console.log('y'+tmp_data.time.substr(0,4))
                             line['y'+tmp_data.time.substr(0,4)] = {value:tmp_data.value, id:tmp_data.id}
                         }
+                        console.log("line",line)
+                        local_data.push(line)
                     }
                 }
                 console.log(local_data)
