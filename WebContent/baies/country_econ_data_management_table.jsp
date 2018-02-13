@@ -56,7 +56,7 @@ var table_data = [];
 var country_data = [];
 var index_data = [];
 var query_args = getQueryString()
-
+var grid_edited_cells = {}
 
 $(document).ready(function() {
 	
@@ -161,11 +161,40 @@ $(document).ready(function() {
 	});
 	
 	$('#save_button').on('click', function() {
-		$('#dialog_window_content').html('请输入版本说明: <input type="text">');
+		$('#dialog_window_content').html('请输入版本说明: <input id="econ_note_input" type="text" >');
+		// 提交
+
+		var post_data = {note:"", data:[], table_id:""}
+		post_data.table_id = query_args.table_id;
+		post_data.note = $('#econ_note_input').val();
+
+		for (var cell in grid_edited_cells) {
+		    post_data.data.push(grid_edited_cells[cell])
+		}
+
+		console.log(post_data)
+
+		$('#dialog_window_ok_button').one('click', function (event) {
+            $.ajax({
+				async: true,
+                crossDomain: true,
+                processData: false,
+                url: "http://127.0.0.1:5000/quantify/socioeconomic_facts/batch",
+                method: "POST",
+				data: JSON.stringify(post_data),
+                headers: {
+                    "Content-Type": "application/json",
+                    "Cache-Control": "no-cache"
+                },
+                success: function (resp) {
+				    console.log(resp);
+                    window.location.reload();
+                }
+            })
+        })
+
 		$('#dialog_window').one('close', function(event) {
 			if(event.args.dialogResult.OK) {
-				grid_edited_cells.length = 0;
-				$('#data_grid').jqxGrid('render');
 				$('#save_button').jqxButton({ disabled: true });
 				$('#message_notification_content').html('修订版本已保存。');
 				$('#message_notification').jqxNotification('open');
@@ -181,12 +210,14 @@ $(document).ready(function() {
 	$('#import_button').on('click', function() {
 		$('#dialog_window_content').html('<table><tr><td>请选择文件:</td><td><input type="file"></td></tr>'
 				+ '<tr><td>请输入版本说明:</td><td><input type="text"></td></tr></table>');
+
 		$('#dialog_window').one('close', function(event) {
 			if(event.args.dialogResult.OK) {
-				$('#message_notification_content').html('文件已导入。');
-				$('#message_notification').jqxNotification('open');
-			}
+                $('#message_notification_content').html('文件已导入。');
+                $('#message_notification').jqxNotification('open');
+            }
 		});
+
 		$('#dialog_window').jqxWindow('open');
 	});
 	
@@ -198,7 +229,9 @@ $(document).ready(function() {
     ];
     var data_fields = [
         {name: 'location', type: 'string', map: 'location'},
-        {name: 'variable', type: 'string', map: 'variable'}
+        {name: 'variable', type: 'string', map: 'variable'},
+		{name: 'country_id', type:'number',map: 'country_id'},
+		{name: 'index_id', type:'number', map:'index_id'}
     ];
     var data_columns = [
         {text: '<fmt:message key="common.dimension.country" />', datafield: 'location', width: 70},
@@ -225,10 +258,14 @@ $(document).ready(function() {
                         var tmp_country = tmp_index.data[country]
                         for (var data in tmp_country.data){
                             var tmp_data = tmp_country.data[data]
-                            var line = {location:tmp_country.country.name,variable: tmp_index.index.name}
+                            var line = {
+                                location: tmp_country.country.name,
+								variable: tmp_index.index.name,
+								country_id: tmp_country.country.id,
+								index_id: tmp_index.index.id
+							}
                             line['y'+tmp_data.time.substr(0,4)] = {value:tmp_data.value, id:tmp_data.id}
                         }
-                        local_data.push(line)
                     }
                 }
                 console.log(local_data)
@@ -256,12 +293,18 @@ $(document).ready(function() {
 		var datafield = args.datafield;
 		var value = args.value;
 		var oldvalue = args.oldvalue;
+		var row = args.row;
 		console.log(args)
 		if(value == oldvalue) {
 			return;
 		}
 		$('#save_button').jqxButton({ disabled: false });
-		grid_edited_cells.push({row: rowindex, datafield: datafield});
+		grid_edited_cells[rowindex+datafield] = {
+            country_id:row.country_id,
+            time:datafield.substr(1,5),
+            index_id:row.index_id,
+            value: value
+		};
 	});
 	
 	$('#dialog_window').jqxWindow({
