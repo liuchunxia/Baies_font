@@ -31,6 +31,15 @@ removeByValue = function(ary,val) {
     }
 };
 
+findArrayByValue = function (ary, value,func) {
+	for (var index in ary) {
+		if (func(ary[index], value) === true) {
+			return ary[index]
+		}
+	}
+	return {}
+}
+
 
 function getQueryString() {
     var qs = location.search.substr(1), // 获取url中"?"符后的字串
@@ -55,8 +64,27 @@ var table_index_data= {};
 var table_data = [];
 var country_data = [];
 var index_data = [];
-var query_args = getQueryString()
-var grid_edited_cells = {}
+var old_query_args = getQueryString();
+var query_args = getQueryString();
+var grid_edited_cells = {};
+var local_data = [
+];
+var data_fields = [
+    {name: 'location', type: 'string', map: 'location'},
+    {name: 'variable', type: 'string', map: 'variable'},
+    {name: 'country_id', type:'number',map: 'country_id'},
+    {name: 'index_id', type:'number', map:'index_id'}
+];
+var data_columns = [
+    {text: '<fmt:message key="common.dimension.country" />', datafield: 'location', width: 70},
+    {text: '<fmt:message key="common.dimension.indicator" />', datafield: 'variable', width: 100}];
+
+var data_source = {
+    localdata: local_data,
+    datafields: data_fields,
+    datatype: 'array'
+};
+var data_adapter = new $.jqx.dataAdapter(data_source);
 
 $(document).ready(function() {
 	
@@ -94,7 +122,11 @@ $(document).ready(function() {
             console.log(country_data,'r2')}.bind(this)
     });
 
-
+    $('#data_grid').jqxGrid({
+        width: '650px', height: '270px', source: data_adapter, columnsresize: true,
+        columns: data_columns, theme: '<%=jqx_theme %>', selectionmode: 'singlecell',
+        editable: true
+    });
 
 	$('#cat_expander').jqxExpander({
 		width: '250px', height: '400px', showArrow: false, toggleMode: 'none', theme: '<%=jqx_theme %>'
@@ -129,7 +161,7 @@ $(document).ready(function() {
     $('#variable_list').jqxDropDownList({
         source: index_data, checkboxes: true,
         width: '100%', theme: '<%=jqx_theme %>',
-        displayMember:"label",valueMember:"value"
+        displayMember:"name",valueMember:"id"
     });
 	
 	$("#variable_list").jqxDropDownList('checkIndex', 0);
@@ -225,71 +257,7 @@ $(document).ready(function() {
 		width: '75px', height: '35px', theme: '<%=jqx_theme %>'
 	});
 
-    var local_data = [
-    ];
-    var data_fields = [
-        {name: 'location', type: 'string', map: 'location'},
-        {name: 'variable', type: 'string', map: 'variable'},
-		{name: 'country_id', type:'number',map: 'country_id'},
-		{name: 'index_id', type:'number', map:'index_id'}
-    ];
-    var data_columns = [
-        {text: '<fmt:message key="common.dimension.country" />', datafield: 'location', width: 70},
-        {text: '<fmt:message key="common.dimension.indicator" />', datafield: 'variable', width: 100}];
 
-    var tmp = function init_data_columns () {
-        for (var year = query_args.start_time;year<=query_args.end_time; year++){
-            data_fields.push({name: 'y'+year, type: 'object', map: 'y'+year.toString()+'>value'} );
-            data_fields.push({name: 'y'+year+'_id', type: 'object', map: 'y'+year.toString()+'>id'} );
-            data_columns.push({text: year.toString(), datafield: 'y'+year, width: 70, cellsalign: 'right'})
-            console.log('fill',year)
-        }
-        console.log(data_fields,data_columns)
-        $.ajax({
-            type:'GET',
-            url:'http://127.0.0.1:5000/quantify/socioeconomic_facts'+location.search,
-            data: {},
-            withCredentials: true,
-            async: false,
-            success: function (resp) {
-                for (var index in resp.data) {
-                    var tmp_index = resp.data[index]
-                    for (var country in tmp_index.data) {
-                        var tmp_country = tmp_index.data[country]
-                        var line = {
-                            location: tmp_country.country.name,
-                            variable: tmp_index.index.name,
-                            country_id: tmp_country.country.id,
-                            index_id: tmp_index.index.id
-                        }
-                        for (var data in tmp_country.data){
-                            var tmp_data = tmp_country.data[data]
-							console.log("tmp_data", tmp_data)
-							console.log('y'+tmp_data.time.substr(0,4))
-                            line['y'+tmp_data.time.substr(0,4)] = {value:tmp_data.value, id:tmp_data.id}
-                        }
-                        console.log("line",line)
-                        local_data.push(line)
-                    }
-                }
-                console.log(local_data)
-            }
-        });
-
-    }()
-
-
-	var data_source = {
-			localdata: local_data,
-			datafields: data_fields,
-			datatype: 'array'
-	};
-	var data_adapter = new $.jqx.dataAdapter(data_source);
-	$('#data_grid').jqxGrid({
-		width: '650px', height: '270px', source: data_adapter, columnsresize: true,
-		columns: data_columns, theme: '<%=jqx_theme %>', selectionmode: 'singlecell',
-		editable: true
-	});
 	
 	$('#data_grid').on('cellendedit', function(event) {
 		var args = event.args;
@@ -335,9 +303,9 @@ $(document).ready(function() {
 
         query_args.table_id=item.value
         index_data.splice(0,index_data.length);
-        query_args.index_ids=[]
+        query_args.index_ids.length = 0
         for (var i in table_index_data[item.id]) {
-            index_data.push({label:table_index_data[item.id][i].name, value:table_index_data[item.id][i].id, id:table_index_data[item.id][i].id})
+            index_data.push(table_index_data[item.id][i])
         }
         console.log('qu', query_args)
         $("#variable_list").jqxDropDownList('render');
@@ -348,7 +316,7 @@ $(document).ready(function() {
         console.log(args)
         var item = $('#variable_list').jqxDropDownList('getItem', args.index);
         if (item.checked === true) {
-            query_args.index_ids.push(item.value)
+            query_args.index_ids.push(item.id)
         }
         else {
             removeByValue(query_args.index_ids,item.value)
@@ -381,6 +349,93 @@ $(document).ready(function() {
 
     $('#cat_tree').jqxTree('selectItem',$("#cat_tree").find('li:first')[0])
 
+    var tmp = function init_data_columns () {
+        for (var year = old_query_args.start_time;year<=old_query_args.end_time; year++){
+            data_fields.push({name: 'y'+year, type: 'object', map: 'y'+year.toString()+'>value'} );
+            data_fields.push({name: 'y'+year+'_id', type: 'object', map: 'y'+year.toString()+'>id'} );
+            data_columns.push({text: year.toString(), datafield: 'y'+year, width: 70, cellsalign: 'right'})
+            console.log('fill',year)
+        }
+        console.log(data_fields,data_columns)
+        $.ajax({
+            type:'GET',
+            url:'http://127.0.0.1:5000/quantify/socioeconomic_facts'+location.search,
+            data: {},
+            withCredentials: true,
+            async: true,
+            success: function (resp) {
+
+                for (var index_id_i in old_query_args.index_ids) {
+                    var index_id = old_query_args.index_ids[index_id_i]
+                    var tmp_same_index_data = findArrayByValue(
+                        resp.data,
+                        index_id,
+                        function (x,y) {
+                            if (x.index.id === y) {
+                                return true
+                            }
+                            return false
+                        })
+
+                    console.log("tmp_same_index_data",tmp_same_index_data)
+                    for (var country_id_i in old_query_args.country_ids) {
+                        var country_id = old_query_args.country_ids[country_id_i]
+                        var tmp_same_country_data = findArrayByValue(
+                            tmp_same_index_data.data,
+                            country_id,
+                            function (x,y) {
+                                if (x.country.id === y) {
+                                    return true
+                                }
+                                return false
+                            }).data
+
+                        console.log("tmp_same_country_data",tmp_same_country_data)
+                        var line = {
+                            location:
+                            findArrayByValue(country_data,
+                                country_id,
+                                function (x,y) {
+                                    if (x.id === y) {
+                                        return true
+                                    }
+                                    return false
+                                }
+                            ).name,
+                            variable: findArrayByValue(index_data,
+                                index_id,
+                                function (x,y) {
+                                    if (x.id === y) {
+                                        return true
+                                    }
+                                    return false
+                                }
+                            ).name,
+                            country_id: country_id,
+                            index_id: index_id
+                        }
+                        for (var tmp_data_i in tmp_same_country_data) {
+                            var tmp_data = tmp_same_country_data[tmp_data_i]
+                            console.log('fill_data',tmp_data)
+                            line['y'+tmp_data.time] = {value:tmp_data.value, id:tmp_data.id}
+                        }
+
+                        local_data.push(line)
+                        console.log('line',line)
+                    }
+                }
+
+
+                console.log('local',local_data)
+                data_adapter.dataBind()
+                $('#data_grid').jqxGrid('render');
+                $('#data_grid').jqxGrid('refresh');
+            }
+        });
+
+
+
+    }()
 
 });
 

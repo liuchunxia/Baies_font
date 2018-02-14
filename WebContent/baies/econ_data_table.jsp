@@ -20,6 +20,7 @@ String jqx_theme = (String)request.getSession().getAttribute("jqx_theme");
 page_id = 2;
 
 
+
 removeByValue = function(ary,val) {
     var index = ary.indexOf(val);
     if (index > -1) {
@@ -27,6 +28,14 @@ removeByValue = function(ary,val) {
     }
 };
 
+findArrayByValue = function (ary, value,func) {
+    for (var index in ary) {
+        if (func(ary[index], value) === true) {
+            return ary[index]
+        }
+    }
+    return {}
+}
 
 function getQueryString() {
     var qs = location.search.substr(1), // 获取url中"?"符后的字串
@@ -52,6 +61,25 @@ var table_data = [];
 var country_data = [];
 var index_data = [];
 var query_args = getQueryString()
+var old_query_args = getQueryString();
+var local_data = [
+];
+var data_fields = [
+    {name: 'location', type: 'string', map: 'location'},
+    {name: 'variable', type: 'string', map: 'variable'},
+    {name: 'country_id', type:'number',map: 'country_id'},
+    {name: 'index_id', type:'number', map:'index_id'}
+];
+var data_columns = [
+    {text: '<fmt:message key="common.dimension.country" />', datafield: 'location', width: 70},
+    {text: '<fmt:message key="common.dimension.indicator" />', datafield: 'variable', width: 100}];
+
+var data_source = {
+    localdata: local_data,
+    datafields: data_fields,
+    datatype: 'array'
+};
+var data_adapter = new $.jqx.dataAdapter(data_source);
 
 $(document).ready(function() {
 	
@@ -90,56 +118,9 @@ $(document).ready(function() {
             console.log(country_data,'r2')}.bind(this)
     });
 
-    var local_data = [
-    ];
-    var data_fields = [
-        {name: 'location', type: 'string', map: '0'},
-        {name: 'variable', type: 'string', map: '1'}
-    ];
-    var data_columns = [
-        {text: '<fmt:message key="common.dimension.country" />', datafield: 'location', width: 70},
-        {text: '<fmt:message key="common.dimension.indicator" />', datafield: 'variable', width: 100}];
 
-    var tmp = function init_data_columns () {
-		for (var year = query_args.start_time;year<=query_args.end_time; year++){
-            data_fields.push({name: 'y'+year, type: 'number', map: (year - query_args.start_time + 2).toString()} );
-		 	data_columns.push({text: year.toString(), datafield: 'y'+year, width: 70, cellsalign: 'right'})
-			console.log('fill',year)
-		}
-        $.ajax({
-            type:'GET',
-            url:'http://127.0.0.1:5000/quantify/socioeconomic_facts'+location.search,
-            data: {},
-            withCredentials: true,
-            async: false,
-            success: function (resp) {
-                for (var index in resp.data) {
-                    var tmp_index = resp.data[index]
-                    for (var country in tmp_index.data) {
-                        var tmp_country = tmp_index.data[country]
-						for (var data in tmp_country.data){
-                            var tmp_data = tmp_country.data[data]
-								var line = [tmp_country.country.name, tmp_index.index.name]
-								var offset = parseInt(tmp_data.time.substr(0,4)) - query_args.start_time + 2
-								line[offset] = tmp_data.value
-						}
-                        local_data.push(line)
-					}
-                }
-                console.log()
-            }
-        });
-
-    }()
 
 	console.log(data_fields,data_columns)
-
-    var data_source = {
-        localdata: local_data,
-        datafields: data_fields,
-        datatype: 'array'
-    };
-    var data_adapter = new $.jqx.dataAdapter(data_source);
 
     $('#cat_expander').jqxExpander({
 		width: '250px', height: '400px', showArrow: false, toggleMode: 'none', theme: '<%=jqx_theme %>'
@@ -272,7 +253,95 @@ $(document).ready(function() {
     // });
 
     $('#cat_tree').jqxTree('selectItem',$("#cat_tree").find('li:first')[0])
-	
+
+    var tmp = function init_data_columns () {
+        for (var year = old_query_args.start_time;year<=old_query_args.end_time; year++){
+            data_fields.push({name: 'y'+year, type: 'object', map: 'y'+year.toString()+'>value'} );
+            data_fields.push({name: 'y'+year+'_id', type: 'object', map: 'y'+year.toString()+'>id'} );
+            data_columns.push({text: year.toString(), datafield: 'y'+year, width: 70, cellsalign: 'right'})
+            console.log('fill',year)
+        }
+        console.log("PUll data")
+        $.ajax({
+            type:'GET',
+            url:'http://127.0.0.1:5000/quantify/socioeconomic_facts'+location.search,
+            data: {},
+            withCredentials: true,
+            async: true,
+            success: function (resp) {
+
+                for (var index_id_i in old_query_args.index_ids) {
+                    var index_id = old_query_args.index_ids[index_id_i]
+                    var tmp_same_index_data = findArrayByValue(
+                        resp.data,
+                        index_id,
+                        function (x,y) {
+                            if (x.index.id === y) {
+                                return true
+                            }
+                            return false
+                        })
+
+                    console.log("tmp_same_index_data",tmp_same_index_data)
+                    for (var country_id_i in old_query_args.country_ids) {
+                        var country_id = old_query_args.country_ids[country_id_i]
+                        var tmp_same_country_data = findArrayByValue(
+                            tmp_same_index_data.data,
+                            country_id,
+                            function (x,y) {
+                                if (x.country.id === y) {
+                                    return true
+                                }
+                                return false
+                            }).data
+
+                        console.log("tmp_same_country_data",tmp_same_country_data)
+                        var line = {
+                            location:
+                            findArrayByValue(country_data,
+                                country_id,
+                                function (x,y) {
+                                    if (x.id === y) {
+                                        return true
+                                    }
+                                    return false
+                                }
+                            ).name,
+                            variable: findArrayByValue(index_data,
+                                index_id,
+                                function (x,y) {
+                                    if (x.id === y) {
+                                        return true
+                                    }
+                                    return false
+                                }
+                            ).name,
+                            country_id: country_id,
+                            index_id: index_id
+                        }
+                        for (var tmp_data_i in tmp_same_country_data) {
+                            var tmp_data = tmp_same_country_data[tmp_data_i]
+                            console.log('fill_data',tmp_data)
+                            line['y'+tmp_data.time] = {value:tmp_data.value, id:tmp_data.id}
+                        }
+
+                        local_data.push(line)
+                        console.log('line',line)
+                    }
+                }
+
+
+                console.log('local',local_data)
+                data_adapter.dataBind()
+                $('#data_grid').jqxGrid('render');
+                $('#data_grid').jqxGrid('refresh');
+            }
+        });
+
+
+
+    }()
+
 });
 
 </script>

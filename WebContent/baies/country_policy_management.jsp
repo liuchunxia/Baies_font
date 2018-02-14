@@ -43,7 +43,7 @@ $(document).ready(function() {
 
     $.ajax({
         type:'GET',
-        url:'http://127.0.0.1:5000/qualitative/Post',
+        url:'http://123.206.8.125:5000/qualitative/Post',
         data: {},
         withCredentials: true,
         async: false,
@@ -135,7 +135,7 @@ $(document).ready(function() {
                         console.log("add a post", post_data)
                         $.ajax({
                             type:'POST',
-                            url:'http://127.0.0.1:5000/qualitative/Post',
+                            url:'http://123.206.8.125:5000/qualitative/Post',
                             data: post_data,
                             withCredentials: true,
                             async: false,
@@ -202,7 +202,7 @@ $(document).ready(function() {
                     console.log("add a post", post_data)
                     $.ajax({
                         type:'POST',
-                        url:'http://127.0.0.1:5000/qualitative/Post',
+                        url:'http://123.206.8.125:5000/qualitative/Post',
                         data: post_data,
                         withCredentials: true,
                         async: false,
@@ -269,7 +269,7 @@ $(document).ready(function() {
                     console.log("add a post", post_data)
                     $.ajax({
                         type:'POST',
-                        url:'http://127.0.0.1:5000/qualitative/Post',
+                        url:'http://123.206.8.125:5000/qualitative/Post',
                         data: post_data,
                         withCredentials: true,
                         async: false,
@@ -336,7 +336,7 @@ $(document).ready(function() {
                     console.log("add a post", post_data)
                     $.ajax({
                         type:'POST',
-                        url:'http://127.0.0.1:5000/qualitative/Post',
+                        url:'http://123.206.8.125:5000/qualitative/Post',
                         data: post_data,
                         withCredentials: true,
                         async: false,
@@ -437,7 +437,7 @@ $(document).ready(function() {
 
                 $.ajax({
                     type:'PUT',
-                    url:'http://127.0.0.1:5000/qualitative/Post/'+post.id,
+                    url:'http://123.206.8.125:5000/qualitative/Post/'+post.id,
                     data: post_data,
                     async: true,
                     withCredentials: true,
@@ -460,7 +460,7 @@ $(document).ready(function() {
                 console.log("delete use ok", post)
                 $.ajax({
                     type:'DELETE',
-                    url:'http://127.0.0.1:5000/qualitative/Post/'+post.id,
+                    url:'http://123.206.8.125:5000/qualitative/Post/'+post.id,
                     data: {},
                     async: true,
                     withCredentials: true,
@@ -505,7 +505,7 @@ $(document).ready(function() {
 
                 $.ajax({
                     type:'PUT',
-                    url:'http://127.0.0.1:5000/qualitative/Post/'+post.id,
+                    url:'http://123.206.8.125:5000/qualitative/Post/'+post.id,
                     data: post_data,
                     async: true,
                     withCredentials: true,
@@ -528,7 +528,7 @@ $(document).ready(function() {
                 console.log("delete use ok", post)
                 $.ajax({
                     type:'DELETE',
-                    url:'http://127.0.0.1:5000/qualitative/Post/'+post.id,
+                    url:'http://123.206.8.125:5000/qualitative/Post/'+post.id,
                     data: {},
                     async: true,
                     withCredentials: true,
@@ -573,7 +573,7 @@ $(document).ready(function() {
 
                 $.ajax({
                     type:'PUT',
-                    url:'http://127.0.0.1:5000/qualitative/Post/'+post.id,
+                    url:'http://123.206.8.125:5000/qualitative/Post/'+post.id,
                     data: post_data,
                     async: true,
                     withCredentials: true,
@@ -596,7 +596,7 @@ $(document).ready(function() {
                 console.log("delete use ok", post)
                 $.ajax({
                     type:'DELETE',
-                    url:'http://127.0.0.1:5000/qualitative/Post/'+post.id,
+                    url:'http://123.206.8.125:5000/qualitative/Post/'+post.id,
                     data: {},
                     async: true,
                     withCredentials: true,
@@ -641,7 +641,7 @@ $(document).ready(function() {
 
                 $.ajax({
                     type:'PUT',
-                    url:'http://127.0.0.1:5000/qualitative/Post/'+post.id,
+                    url:'http://123.206.8.125:5000/qualitative/Post/'+post.id,
                     data: post_data,
                     async: true,
                     withCredentials: true,
@@ -664,7 +664,7 @@ $(document).ready(function() {
                 console.log("delete use ok", post)
                 $.ajax({
                     type:'DELETE',
-                    url:'http://127.0.0.1:5000/qualitative/Post/'+post.id,
+                    url:'http://123.206.8.125:5000/qualitative/Post/'+post.id,
                     data: {},
                     async: true,
                     withCredentials: true,
