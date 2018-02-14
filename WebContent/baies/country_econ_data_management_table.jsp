@@ -192,45 +192,44 @@ $(document).ready(function() {
 	$('#save_button').jqxButton({
 		width: '75px', height: '35px', theme: '<%=jqx_theme %>', disabled: true
 	});
-	
+
 	$('#save_button').on('click', function() {
 		$('#dialog_window_content').html('请输入版本说明: <input id="econ_note_input" type="text" >');
 		// 提交
 
-		var post_data = {note:"", data:[], table_id:""}
-		post_data.table_id = query_args.table_id;
-		post_data.note = $('#econ_note_input').val();
-
-		for (var cell in grid_edited_cells) {
-		    post_data.data.push(grid_edited_cells[cell])
-		}
-
-		console.log(post_data)
-
-		$('#dialog_window_ok_button').one('click', function (event) {
-            $.ajax({
-				async: true,
-                crossDomain: true,
-                processData: false,
-                url: "http://127.0.0.1:5000/quantify/socioeconomic_facts/batch",
-                method: "POST",
-				data: JSON.stringify(post_data),
-                headers: {
-                    "Content-Type": "application/json",
-                    "Cache-Control": "no-cache"
-                },
-                success: function (resp) {
-				    console.log(resp);
-                    window.location.reload();
-                }
-            })
-        })
 
 		$('#dialog_window').one('close', function(event) {
 			if(event.args.dialogResult.OK) {
 				$('#save_button').jqxButton({ disabled: true });
-				$('#message_notification_content').html('修订版本已保存。');
-				$('#message_notification').jqxNotification('open');
+
+                var post_data = {note:"", data:[], table_id:""}
+                post_data.table_id = query_args.table_id;
+                post_data.note = $('#econ_note_input').val();
+
+                for (var cell in grid_edited_cells) {
+                    post_data.data.push(grid_edited_cells[cell])
+                }
+
+                console.log(post_data)
+
+                $.ajax({
+                    async: true,
+                    crossDomain: true,
+                    processData: false,
+                    url: "http://127.0.0.1:5000/quantify/socioeconomic_facts/batch",
+                    method: "POST",
+                    data: JSON.stringify(post_data),
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Cache-Control": "no-cache"
+                    },
+                    success: function (resp) {
+                        console.log(resp);
+                        $('#message_notification_content').html('修订版本已保存。');
+                        $('#message_notification').jqxNotification('open');
+                        window.location.reload();
+                    }
+                })
 			}
 		});
 		$('#dialog_window').jqxWindow('open');

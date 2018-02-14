@@ -335,7 +335,6 @@ $(document).ready(function() {
 
                     }
                 }
-                
                 console.log('local',local_data)
                 data_adapter.dataBind()
                 $('#data_grid').jqxGrid('render');
