@@ -34,6 +34,7 @@ removeByValue = function(ary,val) {
 findArrayByValue = function (ary, value,func) {
 	for (var index in ary) {
 		if (func(ary[index], value) === true) {
+		    console.log("compare",value)
 			return ary[index]
 		}
 	}
@@ -366,31 +367,22 @@ $(document).ready(function() {
             success: function (resp) {
 
                 for (var index_id_i in old_query_args.index_ids) {
-                    var index_id = old_query_args.index_ids[index_id_i]
-                    var tmp_same_index_data = findArrayByValue(
-                        resp.data,
-                        index_id,
-                        function (x,y) {
-                            if (x.index.id === y) {
-                                return true
-                            }
-                            return false
-                        })
-
-                    console.log("tmp_same_index_data",tmp_same_index_data)
+  					var index_id = old_query_args.index_ids[index_id_i]
                     for (var country_id_i in old_query_args.country_ids) {
-                        var country_id = old_query_args.country_ids[country_id_i]
-                        var tmp_same_country_data = findArrayByValue(
-                            tmp_same_index_data.data,
-                            country_id,
-                            function (x,y) {
-                                if (x.country.id === y) {
-                                    return true
-                                }
-                                return false
-                            }).data
+  					    var country_id = old_query_args.country_ids[country_id_i]
 
-                        console.log("tmp_same_country_data",tmp_same_country_data)
+                        var datas = findArrayByValue(
+                            resp.data, {"index_id":index_id, "country_id":country_id},
+							function (x,y) {
+								if (x.country.id === y["country_id"] && x.index.id === y["index_id"]) {
+								    return true
+								}
+								return false
+                            }
+						).data
+
+						console.log("fill datas", datas)
+
                         var line = {
                             location:
                             findArrayByValue(country_data,
@@ -412,17 +404,17 @@ $(document).ready(function() {
                                 }
                             ).name,
                             country_id: country_id,
-                            index_id: index_id
-                        }
-                        for (var tmp_data_i in tmp_same_country_data) {
-                            var tmp_data = tmp_same_country_data[tmp_data_i]
-                            console.log('fill_data',tmp_data)
-                            line['y'+tmp_data.time] = {value:tmp_data.value, id:tmp_data.id}
-                        }
+                            index_id: index_id}
 
-                        local_data.push(line)
-                        console.log('line',line)
-                    }
+                        for (var data_i in datas) {
+							var tmp_data = datas[data_i];
+							console.log("当数据是",[country_id, index_id], "填充",tmp_data)
+                            line['y'+tmp_data.time] = {value:tmp_data.value, id:tmp_data.id}
+  					    }
+  					    console.log("填充完成",line)
+  					    local_data.push(line)
+
+					}
                 }
 
 
