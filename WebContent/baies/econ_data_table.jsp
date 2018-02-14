@@ -19,9 +19,9 @@ String jqx_theme = (String)request.getSession().getAttribute("jqx_theme");
 
 page_id = 2;
 
-var myDate = Date();
+var myDate = new Date();
 
-removeByValue = function(ary,val) {
+	removeByValue = function(ary,val) {
     var index = ary.indexOf(val);
     if (index > -1) {
         ary.splice(index, 1);
@@ -36,6 +36,14 @@ findArrayByValue = function (ary, value,func) {
     }
     return {}
 }
+
+var parseParam=function(param){
+    var paramStr="";
+    for (var key in param) {
+        paramStr = paramStr+ "&"+ key + '=' + JSON.stringify(param[key])
+    }
+    return paramStr.substr(1);
+};
 
 function getQueryString() {
     var qs = location.search.substr(1), // 获取url中"?"符后的字串
@@ -82,7 +90,7 @@ var data_source = {
 var data_adapter = new $.jqx.dataAdapter(data_source);
 
 $(document).ready(function() {
-	
+    old_query_args = getQueryString();
 	var cat_tree_src = econ_data_cat_tree_src_<fmt:message key="common.language" />;
 
 
@@ -180,7 +188,8 @@ $(document).ready(function() {
 	});
 	
 	$('#query_button').on('click', function() {
-		//window.location.href='econ_data_table.jsp';
+		window.location.href='econ_data_table.jsp'+'?'+ parseParam(query_args);
+		window.location.reload()
 	});
 	
 	$('#chart_button').jqxButton({
@@ -204,6 +213,7 @@ $(document).ready(function() {
 		columns: data_columns, theme: '<%=jqx_theme %>'
 	});
 
+
     // 处理事件
     $('#cat_tree').on('select',function (event)
     {
@@ -212,7 +222,7 @@ $(document).ready(function() {
 
         query_args.table_id=item.value
         index_data.splice(0,index_data.length);
-        query_args.index_ids=[]
+        query_args.index_ids.length=0
         for (var i in table_index_data[item.id]) {
             index_data.push(table_index_data[item.id][i])
         }
@@ -224,24 +234,33 @@ $(document).ready(function() {
         var args = event.args;
         console.log(args)
         var item = $('#variable_list').jqxDropDownList('getItem', args.index);
+        console.log("指标选择开始",item)
         if (item.checked === true) {
+            console.log("指标选择")
             query_args.index_ids.push(item.value)
         }
         else {
+            console.log("指标删除")
             removeByValue(query_args.index_ids,item.value)
         }
         console.log('qu', query_args)
     })
 
 
+
+
     $('#location_list').on('select', function (event) {
         var args = event.args;
         var item = $('#location_list').jqxDropDownList('getItem', args.index);
+        console.log("国家选择开始s",item)
+
         if (item.checked === true) {
-            query_args.country_ids.push(item.id)
+            query_args.country_ids.push(item.value)
+			console.log("国家选择")
         }
         else {
-            removeByValue(query_args.country_ids,item.id)
+            console.log("国家取消")
+            removeByValue(query_args.country_ids,item.value)
         }
         console.log('qu', query_args)
     })
@@ -254,24 +273,37 @@ $(document).ready(function() {
         console.log('qu', query_args)
     });
 
-    $('#cat_tree').jqxTree('selectItem',$("#cat_tree").find('li:first')[0])
-
-
+    // chekc
     var checked_variable_list_func = function () {
+
+        $('#cat_tree').jqxTree('selectItem',$("#cat_tree").find('li:first')[0])
+
+		// for (var index_id_i in old_query_args.index_ids) {
+         //    var index_id = old_query_args.index_ids[index_id_i]
+		// 	query_args.index_ids.push(index_id)
+		// }
+		console.log("清空")
+		query_args.country_ids.length = 0
         for (var country_id_i in old_query_args.country_ids) {
             var country_id = old_query_args.country_ids[country_id_i]
             $("#location_list").jqxDropDownList('checkItem',  $("#location_list").jqxDropDownList('getItemByValue',  country_id));
+            $("#location_list").jqxDropDownList('selectItem',  $("#location_list").jqxDropDownList('getItemByValue',  country_id));
+
         }
 
         for (var index_id_i in old_query_args.index_ids) {
             var index_id = old_query_args.country_ids[index_id_i]
+
             $("#variable_list").jqxDropDownList('checkItem',  $("#variable_list").jqxDropDownList('getItemByValue',  index_id));
+            $("#variable_list").jqxDropDownList('selectItem',  $("#variable_list").jqxDropDownList('getItemByValue',  index_id));
+
         }
 
         $('#time_slider').jqxSlider('setValue', [old_query_args.start_time, old_query_args.end_time]);
 
 
     }()
+
 
     var tmp = function init_data_columns () {
         for (var year = old_query_args.start_time;year<=old_query_args.end_time; year++){

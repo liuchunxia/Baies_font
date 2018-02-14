@@ -17,7 +17,7 @@ String jqx_theme = (String)request.getSession().getAttribute("jqx_theme");
 <title><fmt:message key="common.title" /></title>
 <script>
     page_id = 1;
-    var myDate = Date();
+    var myDate = new Date();
     removeByValue = function(ary,val) {
         var index = ary.indexOf(val);
         if (index > -1) {

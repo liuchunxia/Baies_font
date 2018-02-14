@@ -19,7 +19,7 @@ String jqx_theme = (String)request.getSession().getAttribute("jqx_theme");
 
 page_id = 2;
 
-var myDate = Date();
+var myDate = new Date();
 
 $(document).ready(function() {
 	
