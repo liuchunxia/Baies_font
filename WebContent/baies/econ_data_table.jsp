@@ -140,13 +140,13 @@ $(document).ready(function() {
         displayMember:"name",valueMember:"id"
 	});
 	
-	$("#location_list").jqxDropDownList('checkIndex', 0);
-	$("#location_list").jqxDropDownList('checkIndex', 1);
-	$("#location_list").jqxDropDownList('checkIndex', 2);
-	$("#location_list").jqxDropDownList('checkIndex', 3);
-	$("#location_list").jqxDropDownList('checkIndex', 4);
-	$("#location_list").jqxDropDownList('checkIndex', 5);
-	$("#location_list").jqxDropDownList('checkIndex', 6);
+	// $("#location_list").jqxDropDownList('checkIndex', 0);
+	// $("#location_list").jqxDropDownList('checkIndex', 1);
+	// $("#location_list").jqxDropDownList('checkIndex', 2);
+	// $("#location_list").jqxDropDownList('checkIndex', 3);
+	// $("#location_list").jqxDropDownList('checkIndex', 4);
+	// $("#location_list").jqxDropDownList('checkIndex', 5);
+	// $("#location_list").jqxDropDownList('checkIndex', 6);
 	
 	$('#variable_expander').jqxExpander({
 		width: '170px', showArrow: false, toggleMode: 'none', theme: '<%=jqx_theme %>'
@@ -163,6 +163,7 @@ $(document).ready(function() {
 	// $("#variable_list").jqxDropDownList('checkIndex', 2);
 	// $("#variable_list").jqxDropDownList('checkIndex', 3);
 	// $("#variable_list").jqxDropDownList('checkIndex', 4);
+
 	
 	$('#time_slider').jqxSlider({
 		width: '220px', values: [2005, 2010], min: 2000, max: 2016, mode: 'fixed',
@@ -254,6 +255,20 @@ $(document).ready(function() {
 
     $('#cat_tree').jqxTree('selectItem',$("#cat_tree").find('li:first')[0])
 
+
+    var checked_variable_list_func = function () {
+        for (var country_id_i in old_query_args.country_ids) {
+            var country_id = old_query_args.country_ids[country_id_i]
+            $("#location_list").jqxDropDownList('checkItem',  $("#location_list").jqxDropDownList('getItemByValue',  country_id));
+        }
+
+        for (var index_id_i in old_query_args.index_ids) {
+            var index_id = old_query_args.country_ids[index_id_i]
+            $("#variable_list").jqxDropDownList('checkItem',  $("#variable_list").jqxDropDownList('getItemByValue',  index_id));
+        }
+
+    }()
+
     var tmp = function init_data_columns () {
         for (var year = old_query_args.start_time;year<=old_query_args.end_time; year++){
             data_fields.push({name: 'y'+year, type: 'object', map: 'y'+year.toString()+'>value'} );
@@ -337,9 +352,6 @@ $(document).ready(function() {
                 $('#data_grid').jqxGrid('refresh');
             }
         });
-
-
-
     }()
 
 });
