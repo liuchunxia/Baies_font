@@ -16,27 +16,61 @@ String jqx_theme = (String)request.getSession().getAttribute("jqx_theme");
 <jsp:include page="../includes/html_head.jsp" />
 <title><fmt:message key="common.title" /></title>
 <script>
-
-page_id = 1;
+    page_id = 1;
+    $(document).ready(function() {
+       //获取url中的参数
+       function getUrlParam(name) {
+           var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+           var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+           if (r != null) return decodeURI(r[2]); return null; //返回参数值
+       }
+       var id = getUrlParam('id');
+       $.ajax({
+           type: "get",
+           async: false,
+           url: "http://123.206.8.125:5000/qualitative/Post/"+id,
+           data: {},
+           success: function (result) {
+               var data = result.data
+    			$(".news_title").text(data[0].title)
+    			$(".author").text(data[0].user.username)
+    			$(".publish_time").text(data[0].timestamp)
+    			$(".content").html(data[0].body)
+    			var kind_id = data[0].kind_id -1
+               console.log(kind_id)
+               $("#cat_tabs").find('li').removeClass("jqx-tabs-title-selected-top jqx-fill-state-pressed jqx-fill-state-pressed-arctic jqx-tabs-title-selected-top-arctic")
+    			$("#cat_tabs li").eq(kind_id).addClass("jqx-tabs-title-selected-top jqx-fill-state-pressed jqx-fill-state-pressed-arctic jqx-tabs-title-selected-top-arctic")
+           }
+       });
+    })
 
 $(document).ready(function() {
-	
-	var init_tab_content = function (tab) {
+    page_id = 1;
+	console.log(page_id)
+
+    var init_tab_content = function (tab) {
 		$('#news_detail_1').html($('#news_detail').html());
 		$('#news_detail_2').html($('#news_detail').html());
 		$('#news_detail_3').html($('#news_detail').html());
 		$('#news_detail_4').html($('#news_detail').html());
 	};
+
 	
-	$('#news_detail_1').html($('#news_detail').html());
-	$('#news_detail_2').html($('#news_detail').html());
-	$('#news_detail_3').html($('#news_detail').html());
-	$('#news_detail_4').html($('#news_detail').html());
-	
+	// $('#news_detail_1').html($('#news_detail').html());
+	// $('#news_detail_2').html($('#news_detail').html());
+	// $('#news_detail_3').html($('#news_detail').html());
+	// $('#news_detail_4').html($('#news_detail').html());
+
 	$('#cat_tabs').jqxTabs({width: '998px', position: 'top',
 		theme: '<%=jqx_theme %>', initTabContent: init_tab_content});
-	
+    $('#cat_tabs').on('tabclick', function (event)
+    {
+        var clickedItem = event.args.item;
+        window.location.href="policy.jsp?tabIndex="+ clickedItem;
+    });
+
 });
+
 
 </script>
 <style type="text/css">
@@ -92,7 +126,7 @@ $(document).ready(function() {
 
 <div id="news_detail" style="display: none;">
 	<div id="news_content" style="width: 978px; border: 10px solid #E9E9E9;">
-		<div style="width: 100%; padding: 15px 0 20px 0; height: 40px; line-height: 40px; text-align: center; <fmt:message key="policy_detail.title_font" />">
+		<div class="news_title" style="width: 100%; padding: 15px 0 20px 0; height: 40px; line-height: 40px; text-align: center; <fmt:message key="policy_detail.title_font" />">
 			<fmt:message key="temp.policy_title" />
 		</div>
 		<div style="width: 100%; height: 27px; line-height: 27px; font-size: 12px; text-align: center; background-color: #DBDDD8">
@@ -101,7 +135,8 @@ $(document).ready(function() {
 			&nbsp;&nbsp;&nbsp;&nbsp;
 			&nbsp;&nbsp;&nbsp;&nbsp;
 			&nbsp;&nbsp;&nbsp;&nbsp;
-			<fmt:message key="text.author" />: <fmt:message key="temp.policy_author" />
+			<fmt:message key="text.author" />:  <span class="author"></span>
+			<%--<fmt:message key="text.author" />: <fmt:message key="temp.policy_author" />--%>
 			&nbsp;&nbsp;&nbsp;&nbsp;
 			&nbsp;&nbsp;&nbsp;&nbsp;
 			&nbsp;&nbsp;&nbsp;&nbsp;
@@ -111,9 +146,10 @@ $(document).ready(function() {
 			&nbsp;&nbsp;&nbsp;&nbsp;
 			&nbsp;&nbsp;&nbsp;&nbsp;
 			&nbsp;&nbsp;&nbsp;&nbsp;
-			<fmt:message key="text.publish_time" />: 2016-6-23
+			<fmt:message key="text.publish_time" />:<span class="publish_time"></span>
+			<%--<fmt:message key="text.publish_time" />: 2016-6-23--%>
 		</div>
-		<div style="width: 788px; padding: 20px 95px 20px 95px;">
+		<div style="width: 788px; padding: 20px 95px 20px 95px;" class="content">
 
 <c:choose>
 	<c:when test="${language == 'zh'}">
@@ -160,7 +196,7 @@ $(document).ready(function() {
 
 	</c:when>
 	<c:otherwise>
-	
+
 <p>More than 33.6 million students living in poverty have become healthier overall as a result of government subsidized meals, but improved food availability and safety remain top priorities, along with health education, the Ministry of Education said.</p>
 <p>Fifteen organizations, including the finance and education ministries, launched a nutrition drive in 2011 to help needy children from first to ninth grade.</p>
 <div style="text-align: center;"><img src="../images/article_en.jpg" style="width: 550px; height: 366px;"></div>
@@ -175,7 +211,7 @@ $(document).ready(function() {
 <p>Besides strengthening education effort, Deng suggested that government and schools should focus on improving the quantity and quality of meals.</p>
 <p>"Food availability shouldn't be a problem," he said. "Schools can buy food from local residents. This not only helps alleviate poverty in the community but also ensures a sustainable source."</p>
 <p>Further, schools need to have the authority to negotiate deals and be transparent in the process, Deng said.</p>
-	
+
 	</c:otherwise>
 </c:choose>
 
@@ -186,4 +222,7 @@ $(document).ready(function() {
 <jsp:include page="../includes/html_body_footer.jsp" />
 
 </body>
+<script>
+
+</script>
 </html>
