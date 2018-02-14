@@ -19,8 +19,46 @@ String jqx_theme = (String)request.getSession().getAttribute("jqx_theme");
 
 page_id = 0;
 
+var selete_cat = 'cat1'
+
+
+var data = [];
+
+var source = {
+    localdata: data,
+    datatype: 'array',
+    datafields: [{name: 'picture', type: 'string'},
+        {name: 'title', type: 'string'},
+        {name: 'country', type: 'string'},
+        {name: 'author', type: 'string'},
+        {name: 'create_time', type: 'string'},
+        {name: 'modify_time', type: 'string'},
+        {name: 'operation', type: 'string'},
+        {name: 'body', type:'string'},
+        {name: 'kind_id', type:'string'}],
+};
+var dataAdapter = new $.jqx.dataAdapter(source);
+var settings = {
+    width: '850px',
+    source: dataAdapter,
+    autoheight: true,
+    autorowheight: true,
+    showheader: true,
+    pageable: true,
+    pagesize: 10,
+    theme: '<%=jqx_theme %>',
+    columns: [
+        // {text: '', dataField: 'picture', width: 65, align: 'center'},
+        {text: '标题', dataField: 'title', width: 345, align: 'center'},
+        {text: '<fmt:message key="common.dimension.country" />', dataField: 'country', width: 80, align: 'center', cellsalign: 'center'},
+        {text: '<fmt:message key="text.author" />', dataField: 'author', width: 80, align: 'center', cellsalign: 'center'},
+        {text: '创建时间', dataField: 'create_time', width: 100, align: 'center', cellsalign: 'center'},
+        // {text: '修改时间', dataField: 'modify_time', width: 100, align: 'center', cellsalign: 'center'},
+        {text: '操作', dataField: 'operation', width: 80, align: 'center', cellsalign: 'center'}
+    ]
+};
 $(document).ready(function() {
-	
+
 	$('#nav2_tabs').jqxTabs({width: '998px', position: 'top', theme: '<%=jqx_theme %>'});
 	$('#nav2_tabs').jqxTabs({ selectedItem: 0 });
 	$('#nav2_tabs').on('selected', function (event) {
@@ -34,58 +72,78 @@ $(document).ready(function() {
 	      		{ label: '农业科技发展信息', value: 'cat3' },
 	      		{ label: '渔业水产政策信息', value: 'cat4' },
 	      	];
-	$('#cat_dropdownlist').jqxDropDownList({
-		width: 150, theme: '<%=jqx_theme %>', source: categories,
-		dropDownHeight: 110
-	});
-	$('#cat_dropdownlist').jqxDropDownList('selectItem',
-			$('#cat_dropdownlist').jqxDropDownList('getItemByValue', 'cat1'));
-	
+
 	var rows = $("#news_ul");
-	var data = [];
-	for (var i = 0; i < 100; i++) {
-		var row = rows[0];
-		var datarow = {};
-		datarow['picture'] = $(row).find('li:nth-child(1)').html();
-		datarow['title'] = $(row).find('li:nth-child(2)').html();
-		datarow['country'] = $(row).find('li:nth-child(3)').html();
-		datarow['author'] = $(row).find('li:nth-child(4)').html();
-		datarow['create_time'] = $(row).find('li:nth-child(5)').html();
-		datarow['modify_time'] = $(row).find('li:nth-child(6)').html();
-		datarow['operation'] = $(row).find('li:nth-child(7)').html();
-		data[data.length] = datarow;
-	}
-	var source = {
-			localdata: data,
-			datatype: 'array',
-			datafields: [{name: 'picture', type: 'string'},
-			             {name: 'title', type: 'string'},
-			             {name: 'country', type: 'string'},
-			             {name: 'author', type: 'string'},
-			             {name: 'create_time', type: 'string'},
-			             {name: 'modify_time', type: 'string'},
-			             {name: 'operation', type: 'string'}],
-	};
-	var dataAdapter = new $.jqx.dataAdapter(source);
-	var settings = {
-			width: '850px',
-			source: dataAdapter,
-			autoheight: true,
-			autorowheight: true,
-			showheader: true,
-			pageable: true,
-			pagesize: 10,
-			theme: '<%=jqx_theme %>',
-			columns: [{text: '', dataField: 'picture', width: 65, align: 'center'},
-			          {text: '标题', dataField: 'title', width: 345, align: 'center'},
-			          {text: '<fmt:message key="common.dimension.country" />', dataField: 'country', width: 80, align: 'center', cellsalign: 'center'},
-			          {text: '<fmt:message key="text.author" />', dataField: 'author', width: 80, align: 'center', cellsalign: 'center'},
-			          {text: '创建时间', dataField: 'create_time', width: 100, align: 'center', cellsalign: 'center'},
-			          {text: '修改时间', dataField: 'modify_time', width: 100, align: 'center', cellsalign: 'center'},
-			          {text: '操作', dataField: 'operation', width: 80, align: 'center', cellsalign: 'center'}
-			          ]
-	};
-	$('#news_grid').jqxGrid(settings);
+
+	// for (var i = 0; i < 100; i++) {
+	// 	var row = rows[0];
+	// 	var datarow = {};
+	// 	datarow['picture'] = $(row).find('li:nth-child(1)').html();
+	// 	datarow['title'] = $(row).find('li:nth-child(2)').html();
+	// 	datarow['country'] = $(row).find('li:nth-child(3)').html();
+	// 	datarow['author'] = $(row).find('li:nth-child(4)').html();
+	// 	datarow['create_time'] = $(row).find('li:nth-child(5)').html();
+	// 	datarow['modify_time'] = $(row).find('li:nth-child(6)').html();
+	// 	datarow['operation'] = $(row).find('li:nth-child(7)').html();
+	// 	data[data.length] = datarow;
+	// }
+
+
+
+    $('#cat_dropdownlist').jqxDropDownList({
+        width: 150, theme: '<%=jqx_theme %>', source: categories,
+        dropDownHeight: 110
+    });
+    // 选择变化
+    $('#cat_dropdownlist').on('select', function (event)
+    {
+        var args = event.args;
+        if (args) {
+            // index represents the item's index.
+            var index = args.index;
+            var item = args.item;
+            // get item's label and value.
+            var label = item.label;
+            var value = item.value;
+            var type = args.type; // keyboard, mouse or null depending on how the item was selected.
+			selete_cat = value;
+			console.log("seleted",selete_cat[3])
+            data.length = 0;
+            $.ajax({
+                type:'GET',
+                url:'http://127.0.0.1:5000/qualitative/Post',
+                data: {kind_id:selete_cat[3]},
+                withCredentials: true,
+                async: true,
+                success: function (resp) {
+                    for (var index in resp.data) {
+                        var row = rows[0];
+                        var datarow = {}
+                        datarow['id'] = resp.data[index].id
+                        datarow['title'] = resp.data[index].title
+                        datarow['author'] = resp.data[index].user.username
+                        datarow['create_time'] = resp.data[index].timestamp
+                        datarow['status'] = resp.data[index].show
+                        datarow['operation'] = $(row).find('li:nth-child(7)').html();
+                        datarow['body'] = resp.data[index].body
+                        datarow['kind_id'] = resp.data[index].kind_id
+                        data[data.length] = datarow;
+                    }
+                    dataAdapter.dataBind()
+                    $('#news_grid').jqxGrid('render');
+                    $('#news_grid').jqxGrid('refresh');
+                }
+            });
+
+        }
+
+    });
+
+    $('#cat_dropdownlist').jqxDropDownList('selectItem',
+        $('#cat_dropdownlist').jqxDropDownList('getItemByValue', 'cat1'));
+
+
+    $('#news_grid').jqxGrid(settings);
 	
 	$('#dialog_window').jqxWindow({
 		width: 350, height: 'auto', resizable: false,  isModal: true, autoOpen: false,
@@ -98,13 +156,7 @@ $(document).ready(function() {
 	$("#dialog_window_cancel_button").jqxButton({
 		theme: '<%=jqx_theme %>'
 	});
-	
-	$('.detail_buttons').on('click', function() {
-		$('#detail_title').html('<fmt:message key="temp.policy_title" />');
-		$('#detail_content_panel').jqxPanel('clearcontent');
-		$('#detail_content_panel').jqxPanel('append', $('<div />').html($('#detail_content').html()).text());
-		$('#detail_window').jqxWindow('open');
-	});
+
 	
 	$('.approve_buttons').on('click', function() {
 		$('#dialog_window_content').html('是否通过本信息？');
@@ -159,6 +211,25 @@ $(document).ready(function() {
 	$('#message_notification').jqxNotification({
 		width: 'auto', position: "bottom-right", opacity: 0.9, template: 'success', theme: '<%=jqx_theme %>'
 	});
+
+    $("#news_grid").on("cellclick", function (event)
+    {
+        // event arguments.
+        var args = event.args;
+
+        var post = args.row.bounddata;
+        console.log(args)
+
+
+        $('.detail_buttons').on('click', function() {
+            $('#detail_title').html(post.title);
+            $('#detail_content_panel').jqxPanel('clearcontent');
+            console.log("detail open");
+            $('#detail_content_panel').jqxPanel('append', $('<div />').html(post.body).text());
+            $('#detail_window').jqxWindow('open');
+        });
+
+    });
 	
 });
 
