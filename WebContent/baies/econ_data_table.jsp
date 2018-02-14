@@ -88,7 +88,7 @@ $(document).ready(function() {
 
     $.ajax({
         type:'GET',
-        url:'http://127.0.0.1:5000/quantify/socioeconomic_table',
+        url:'http://123.206.8.125:5000/quantify/socioeconomic_table',
         data: {},
         withCredentials: true,
         async: false,
@@ -107,7 +107,7 @@ $(document).ready(function() {
 
     $.ajax({
         type:'GET',
-        url:'http://127.0.0.1:5000/quantify/country',
+        url:'http://123.206.8.125:5000/quantify/country',
         data: {},
         withCredentials: true,
         async: false,
@@ -279,7 +279,7 @@ $(document).ready(function() {
         console.log("PUll data")
         $.ajax({
             type:'GET',
-            url:'http://127.0.0.1:5000/quantify/socioeconomic_facts'+location.search,
+            url:'http://123.206.8.125:5000/quantify/socioeconomic_facts'+location.search,
             data: {},
             withCredentials: true,
             async: true,
