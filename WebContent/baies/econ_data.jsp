@@ -18,7 +18,7 @@ String jqx_theme = (String)request.getSession().getAttribute("jqx_theme");
 <script>
 
 page_id = 2;
-
+var myDate = Date();
 removeByValue = function(ary,val) {
     var index = ary.indexOf(val);
     if (index > -1) {
@@ -112,7 +112,7 @@ $(document).ready(function() {
 	});
 	
 	$('#time_slider').jqxSlider({
-		width: '95%', values: [2005, 2010], min: 2000, max: 2016, mode: 'fixed',
+		width: '95%', values: [2005, 2010], min: 2000, max: myDate.getFullYear(), mode: 'fixed',
 		rangeSlider: true, theme: '<%=jqx_theme %>', ticksFrequency: 1
 	});
 	

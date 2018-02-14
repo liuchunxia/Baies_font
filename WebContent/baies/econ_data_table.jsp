@@ -19,7 +19,7 @@ String jqx_theme = (String)request.getSession().getAttribute("jqx_theme");
 
 page_id = 2;
 
-
+var myDate = Date();
 
 removeByValue = function(ary,val) {
     var index = ary.indexOf(val);
@@ -151,12 +151,12 @@ $(document).ready(function() {
 	$('#variable_expander').jqxExpander({
 		width: '170px', showArrow: false, toggleMode: 'none', theme: '<%=jqx_theme %>'
 	});
-	
-	$('#variable_list').jqxDropDownList({
-		source: index_data, checkboxes: true,
-		width: '100%', theme: '<%=jqx_theme %>',
-        displayMember:"label",valueMember:"value"
-	});
+
+    $('#variable_list').jqxDropDownList({
+        source: index_data, checkboxes: true,
+        width: '100%', theme: '<%=jqx_theme %>',
+        displayMember:"name",valueMember:"id"
+    });
 	
 	// $("#variable_list").jqxDropDownList('checkIndex', 0);
 	// $("#variable_list").jqxDropDownList('checkIndex', 1);
@@ -166,7 +166,7 @@ $(document).ready(function() {
 
 	
 	$('#time_slider').jqxSlider({
-		width: '220px', values: [2005, 2010], min: 2000, max: 2016, mode: 'fixed',
+		width: '220px', values: [2005, 2010], min: 2000, max:myDate.getFullYear(), mode: 'fixed',
 		rangeSlider: true, theme: '<%=jqx_theme %>', ticksFrequency: 1
 	});
 	
@@ -194,9 +194,12 @@ $(document).ready(function() {
 	$('#export_button').jqxButton({
 		width: '100px', height: '47px', theme: '<%=jqx_theme %>'
 	});
-	
 
-	$('#data_grid').jqxGrid({
+    $('#export_button').on('click', function () { $("#data_grid").jqxGrid('exportdata', 'xls', '经济数据');});
+
+
+
+    $('#data_grid').jqxGrid({
 		width: '650px', height: '270px', source: data_adapter, columnsresize: true,
 		columns: data_columns, theme: '<%=jqx_theme %>'
 	});
@@ -211,7 +214,7 @@ $(document).ready(function() {
         index_data.splice(0,index_data.length);
         query_args.index_ids=[]
         for (var i in table_index_data[item.id]) {
-            index_data.push({label:table_index_data[item.id][i].name, value:table_index_data[item.id][i].id, id:table_index_data[item.id][i].id})
+            index_data.push(table_index_data[item.id][i])
         }
         console.log('qu', query_args)
         $("#variable_list").jqxDropDownList('render');
@@ -242,16 +245,14 @@ $(document).ready(function() {
         }
         console.log('qu', query_args)
     })
-    // var values = $('#time_slider').jqxSlider('values');
-    // query_args.start_time = values[0].toString();
-    // query_args.end_time = values[1].toString();
 
-    // $('#time_slider').on('change', function (event) {
-    //     var values = $('#time_slider').jqxSlider('values');
-    //     query_args.start_time = values[0]
-    //     query_args.end_time = values[1]
-    //     console.log('qu', query_args)
-    // });
+
+    $('#time_slider').on('change', function (event) {
+        var values = $('#time_slider').jqxSlider('values');
+        query_args.start_time = values[0]
+        query_args.end_time = values[1]
+        console.log('qu', query_args)
+    });
 
     $('#cat_tree').jqxTree('selectItem',$("#cat_tree").find('li:first')[0])
 
@@ -266,6 +267,9 @@ $(document).ready(function() {
             var index_id = old_query_args.country_ids[index_id_i]
             $("#variable_list").jqxDropDownList('checkItem',  $("#variable_list").jqxDropDownList('getItemByValue',  index_id));
         }
+
+        $('#time_slider').jqxSlider('setValue', [old_query_args.start_time, old_query_args.end_time]);
+
 
     }()
 

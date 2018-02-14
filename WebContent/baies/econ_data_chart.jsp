@@ -19,6 +19,8 @@ String jqx_theme = (String)request.getSession().getAttribute("jqx_theme");
 
 page_id = 2;
 
+var myDate = Date();
+
 $(document).ready(function() {
 	
 	var cat_tree_src = econ_data_cat_tree_src_<fmt:message key="common.language" />;
@@ -58,7 +60,7 @@ $(document).ready(function() {
 	$("#variable_list").jqxDropDownList('checkIndex', 0);
 	
 	$('#time_slider').jqxSlider({
-		width: '220px', values: [2005, 2010], min: 2000, max: 2016, mode: 'fixed',
+		width: '220px', values: [2005, 2010], min: 2000, max: myDate.getFullYear(), mode: 'fixed',
 		rangeSlider: true, theme: '<%=jqx_theme %>', ticksFrequency: 1
 	});
 	
