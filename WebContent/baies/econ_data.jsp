@@ -173,7 +173,7 @@ $(document).ready(function() {
     })
     var values = $('#time_slider').jqxSlider('values');
     query_args.start_time = values[0];
-    query_args.end_time = values[1].toString();
+    query_args.end_time = values[1];
 
     $('#time_slider').on('change', function (event) {
         var values = $('#time_slider').jqxSlider('values');

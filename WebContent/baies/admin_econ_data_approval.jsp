@@ -35,29 +35,32 @@ $(document).ready(function() {
 	
 	var rows = $("#data_ul");
 	var data = [];
-	for (var i = 0; i < 100; i++) {
-		var row = rows[0];
-		var datarow = {};
-		datarow['version_id'] = 162 - i;
-		var objs = econ_data_cat_tree_src_<fmt:message key="common.language" />[0].items;
-		datarow['category'] = objs[Math.floor(Math.random()*objs.length)].label;
-		datarow['country'] = $(row).find('li:nth-child(3)').html();
-		datarow['author'] = $(row).find('li:nth-child(4)').html();
-		datarow['time'] = $(row).find('li:nth-child(5)').html();
-		datarow['description'] = $(row).find('li:nth-child(6)').find('span:nth-child('+(Math.floor(Math.random()*2)+1)+')').html();
-		datarow['operation'] = $(row).find('li:nth-child(7)').html();
-		data[data.length] = datarow;
-	}
+	<%--for (var i = 0; i < 100; i++) {--%>
+		<%--var row = rows[0];--%>
+		<%--var datarow = {};--%>
+		<%--datarow['version_id'] = 162 - i;--%>
+		<%--var objs = econ_data_cat_tree_src_<fmt:message key="common.language" />[0].items;--%>
+		<%--datarow['category'] = objs[Math.floor(Math.random()*objs.length)].label;--%>
+		<%--datarow['country'] = $(row).find('li:nth-child(3)').html();--%>
+		<%--datarow['author'] = $(row).find('li:nth-child(4)').html();--%>
+		<%--datarow['time'] = $(row).find('li:nth-child(5)').html();--%>
+		<%--datarow['description'] = $(row).find('li:nth-child(6)').find('span:nth-child('+(Math.floor(Math.random()*2)+1)+')').html();--%>
+		<%--datarow['operation'] = $(row).find('li:nth-child(7)').html();--%>
+		<%--data[data.length] = datarow;--%>
+	<%--}--%>
+
 	var source = {
 			localdata: data,
 			datatype: 'array',
-			datafields: [{name: 'version_id', type: 'number'},
+			datafields: [{name: 'id', type: 'number'},
 			             {name: 'category', type: 'string'},
 			             {name: 'country', type: 'string'},
 			             {name: 'author', type: 'string'},
 			             {name: 'time', type: 'string'},
 			             {name: 'description', type: 'string'},
-			             {name: 'operation', type: 'string'}],
+			             {name: 'operation', type: 'string'},
+				         {name: 'pre', type:'object'},
+                		 {name: 'past', type:'object'}],
 	};
 	var dataAdapter = new $.jqx.dataAdapter(source);
 	var settings = {
@@ -78,6 +81,38 @@ $(document).ready(function() {
 			          {text: '操作', dataField: 'operation', width: 80, align: 'center', cellsalign: 'center'}
 			          ]
 	};
+
+
+    $.ajax({
+        type:'GET',
+        url:'http://127.0.0.1:5000/user/Log?',
+        data: {kind:1},
+        withCredentials: true,
+        async: true,
+        success: function (resp) {
+            for (var index in resp.data) {
+                var row = rows[0];
+                var per_log = resp.data[index];
+                var datarow = {}
+
+                datarow["id"] = per_log.id
+				datarow["pre"] = $.parseJSON(per_log.pre)
+                datarow["past"] = $.parseJSON(per_log.past)
+
+                datarow['category'] = $.parseJSON(per_log.target).name;
+                datarow['country'] = per_log.user.country;
+                datarow['author'] = per_log.user.username;
+                datarow['time'] = per_log.timestamp;
+                datarow['description'] = per_log.note;
+                datarow['operation'] = $(row).find('li:nth-child(7)').html();
+                data[data.length] = datarow;
+            }
+            dataAdapter.dataBind()
+            $('#data_grid').jqxGrid('render');
+            $('#data_grid').jqxGrid('refresh');
+        }
+    });
+
 	$('#data_grid').jqxGrid(settings);
 	
 	$('#dialog_window').jqxWindow({
