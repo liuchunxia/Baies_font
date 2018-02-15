@@ -163,7 +163,28 @@ $(document).ready(function() {
 	});
 	
 });
-
+$(document).ready(function() {
+    $.ajax({
+        type: "get",
+        async: false,
+        url: "http://123.206.8.125:5000/qualitative/Post",
+        data: {},
+        success: function (result) {
+            var data = result.data
+            data.forEach(function (value,index) {
+                if(value.kind_id == 1){
+                    $(".policy_expander_1").append('<div class="news_content">· <a href="policy_detail.jsp?id='+ value.id+'">'+value.title+'</a></div>')
+                }else if(value.kind_id == 2){
+                    $(".policy_expander_2").append('<div class="news_content">· <a href="policy_detail.jsp?id='+ value.id+'">'+value.title+'</a></div>')
+                }else if(value.kind_id == 3){
+                    $(".policy_expander_3").append('<div class="news_content">·<a href="policy_detail.jsp?id='+ value.id+'">'+value.title+'</a></div>')
+                }else {
+                    $(".policy_expander_4").append('<div class="news_content">·<a href="policy_detail.jsp?id='+ value.id+'">'+value.title+'</a></div>')
+                }
+            })
+        }
+    });
+})
 
 </script>
 <style type="text/css">
@@ -225,25 +246,25 @@ $(document).ready(function() {
 	<div class="left margin_5"></div>
 	<div id="policy_expander_1" class="left">
 		<div style="width: 98%;"><div class="left"><fmt:message key="cat.dev" /></div><div class="right"><a href=""><fmt:message key="text.more" />&gt;</a></div></div>
-		<div style="overflow: hidden;">
+		<div style="overflow: hidden;" class="policy_expander_1">
 			<div class="margin_30"></div>
-			<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>
-			<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>
-			<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>
-			<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>
-			<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>
+			<%--<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>--%>
+			<%--<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>--%>
+			<%--<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>--%>
+			<%--<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>--%>
+			<%--<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>--%>
 		</div>
 	</div>
 	<div class="left margin_5"></div>
 	<div id="policy_expander_2" class="left">
 		<div style="width: 98%;"><div class="left"><fmt:message key="cat.trade" /></div><div class="right"><a href=""><fmt:message key="text.more" />&gt;</a></div></div>
-		<div style="overflow: hidden;">
+		<div style="overflow: hidden;" class="policy_expander_2">
 			<div class="margin_30"></div>
-			<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>
-			<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>
-			<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>
-			<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>
-			<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>
+			<%--<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>--%>
+			<%--<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>--%>
+			<%--<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>--%>
+			<%--<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>--%>
+			<%--<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>--%>
 		</div>
 	</div>
 	<div class="clear"></div>
@@ -268,25 +289,25 @@ $(document).ready(function() {
 	<div class="left margin_5"></div>
 	<div id="policy_expander_3" class="left">
 		<div style="width: 98%;"><div class="left"><fmt:message key="cat.tech" /></div><div class="right"><a href=""><fmt:message key="text.more" />&gt;</a></div></div>
-		<div style="overflow: hidden;">
+		<div style="overflow: hidden;" class="policy_expander_3">
 			<div class="margin_30"></div>
-			<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>
-			<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>
-			<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>
-			<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>
-			<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>
+			<%--<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>--%>
+			<%--<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>--%>
+			<%--<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>--%>
+			<%--<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>--%>
+			<%--<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>--%>
 		</div>
 	</div>
 	<div class="left margin_5"></div>
 	<div id="policy_expander_4" class="left">
 		<div style="width: 98%;"><div class="left"><fmt:message key="cat.fish" /></div><div class="right"><a href=""><fmt:message key="text.more" />&gt;</a></div></div>
-		<div style="overflow: hidden;">
+		<div style="overflow: hidden;" class="policy_expander_4">
 			<div class="margin_30"></div>
-			<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>
-			<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>
-			<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>
-			<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>
-			<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>
+			<%--<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>--%>
+			<%--<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>--%>
+			<%--<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>--%>
+			<%--<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>--%>
+			<%--<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title_short" /></a></div>--%>
 		</div>
 	</div>
 	<div class="clear"></div>
@@ -295,4 +316,7 @@ $(document).ready(function() {
 <jsp:include page="../includes/html_body_footer.jsp" />
 
 </body>
+<script>
+
+</script>
 </html>
