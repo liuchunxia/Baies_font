@@ -22,36 +22,219 @@ page_id = 1;
 $(document).ready(function() {
 	
 	$('#cat_tabs').jqxTabs({width: '998px', position: 'top', theme: '<%=jqx_theme %>'});
-	
+
 	var rows = $("#news_ul");
-	var data = [];
-	for (var i = 0; i < 100; i++) {
-		var row = rows[0];
-		var datarow = {};
-		datarow['news'] = $(row).find('li').html();
-		data[data.length] = datarow;
-	}
-	var source = {
-			localdata: data,
-			datatype: 'array',
-			datafields: [{name: 'news', type: 'string'}],
-	};
-	var dataAdapter = new $.jqx.dataAdapter(source);
-	var settings = {
-			width: '90%',
-			source: dataAdapter,
-			autoheight: true,
-			autorowheight: true,
-			showheader: false,
-			pageable: true,
-			pagesize: 5,
-			columns: [{text: 'news', dataField: 'news'}]
-	};
-	$('#news_grid_1').jqxGrid(settings);
-	$('#news_grid_2').jqxGrid(settings);
-	$('#news_grid_3').jqxGrid(settings);
-	$('#news_grid_4').jqxGrid(settings);
-	
+    var data_kind_1 = [];
+    var data_kind_2 = [];
+    var data_kind_3 = [];
+    var data_kind_4 = [];
+    $.ajax({
+        type: "get",
+        async: false,
+        url: "http://123.206.8.125:5000/qualitative/Post",
+        data: {},
+        success: function (result) {
+            var datas = result.data
+            datas.forEach(function (value,index) {
+                var row = rows[0];
+                var datarow = {};
+                datarow['id'] = value.id;
+                datarow['title'] = value.title;
+                datarow['body'] = value.body;
+                datarow['kind_id'] = value.kind_id;
+                // console.log(datarow)
+
+                switch(datarow['kind_id'])
+                {
+                    case 1:
+                        data_kind_1[data_kind_1.length] = datarow;
+                        break;
+                    case 2:
+                        data_kind_2[data_kind_2.length] = datarow;
+                        break;
+                    case 3:
+                        data_kind_3[data_kind_3.length] = datarow;
+                        break;
+                    case 4:
+                        data_kind_4[data_kind_4.length] = datarow;
+                        break;
+                    default:
+                        break;
+                }
+            })
+        }
+    });
+    var source_kind_1 = {
+        localdata: data_kind_1,
+        datatype: 'array',
+        datafields: [{name:'id', type:'number'},
+            {name: 'title', type: 'string'},
+            {name: 'body', type:'string'},
+            {name: 'kind_id', type:'string'}]
+    };
+
+    var dataAdapter_kind_1 = new $.jqx.dataAdapter(source_kind_1);
+    var settings_kind_1 = {
+        width: '90%',
+        source: dataAdapter_kind_1,
+		autoheight: true,
+		autorowheight: true,
+		showheader: false,
+		pageable: true,
+		pagesize: 5,
+		columns: [
+		    {text: '标题', dataField: 'title'},
+		    {text: '内容', dataField: 'body'}
+		    ]
+    };
+
+    var source_kind_2 = {
+        localdata: data_kind_2,
+        datatype: 'array',
+        datafields: [{name:'id', type:'number'},
+            {name: 'title', type: 'string'},
+            {name: 'body', type:'string'},
+            {name: 'kind_id', type:'string'}]
+    };
+    var dataAdapter_kind_2 = new $.jqx.dataAdapter(source_kind_2);
+    var settings_kind_2 = {
+        width: '90%',
+        source: dataAdapter_kind_2,
+		autoheight: true,
+		autorowheight: true,
+		showheader: false,
+		pageable: true,
+		pagesize: 5,
+		columns: [
+		    {text: '标题', dataField: 'title'},
+		    {text: '内容', dataField: 'body'}
+		    ]
+    };
+
+    var source_kind_3 = {
+        localdata: data_kind_3,
+        datatype: 'array',
+        datafields: [{name:'id', type:'number'},
+            {name: 'title', type: 'string'},
+            {name: 'body', type:'string'},
+            {name: 'kind_id', type:'string'}]
+    };
+    var dataAdapter_kind_3 = new $.jqx.dataAdapter(source_kind_3);
+    var settings_kind_3 = {
+        width: '90%',
+        source: dataAdapter_kind_3,
+		autoheight: true,
+		autorowheight: true,
+		showheader: false,
+		pageable: true,
+		pagesize: 5,
+		columns: [
+		    {text: '标题', dataField: 'title'},
+		    {text: '内容', dataField: 'body'}
+		    ]
+    };
+
+    var source_kind_4 = {
+        localdata: data_kind_4,
+        datatype: 'array',
+        datafields: [{name:'id', type:'number'},
+            {name: 'title', type: 'string'},
+            {name: 'body', type:'string'},
+            {name: 'kind_id', type:'string'}]
+    };
+    var dataAdapter_kind_4 = new $.jqx.dataAdapter(source_kind_4);
+    var settings_kind_4 = {
+        width: '90%',
+        source: dataAdapter_kind_4,
+		autoheight: true,
+		autorowheight: true,
+		showheader: false,
+		pageable: true,
+		pagesize: 5,
+		columns: [
+		    {text: '标题', dataField: 'title'},
+		    {text: '内容', dataField: 'body'}
+		    ]
+    };
+
+    // var data = [];
+	// for (var i = 0; i < 100; i++) {
+	// 	var row = rows[0];
+	// 	var datarow = {};
+	// 	datarow['news'] = $(row).find('li').html();
+	// 	console.log($(row).find('li').html())
+	// 	data[data.length] = datarow;
+	// }
+	// var source = {
+	// 		localdata: data,
+	// 		datatype: 'array',
+	// 		datafields: [{name: 'news', type: 'string'}],
+	// };
+	// var dataAdapter = new $.jqx.dataAdapter(source);
+	// var settings = {
+	// 		width: '90%',
+	// 		source: dataAdapter,
+	// 		autoheight: true,
+	// 		autorowheight: true,
+	// 		showheader: false,
+	// 		pageable: true,
+	// 		pagesize: 5,
+	// 		columns: [{text: 'news', dataField: 'news'}]
+	// };
+	$('#news_grid_1').jqxGrid(settings_kind_1);
+	$('#news_grid_2').jqxGrid(settings_kind_2);
+	$('#news_grid_3').jqxGrid(settings_kind_3);
+	$('#news_grid_4').jqxGrid(settings_kind_4);
+
+    // $("#contenttablenews_grid_1 div").click(function () {
+    //     window.location.href="输入另一个页面的链接"
+    // })
+    $('#news_grid_1').on('rowclick', function (event) {
+        var args = event.args;
+        var boundIndex = args.rowindex;
+        var data = $('#news_grid_1').jqxGrid('getrowdata', boundIndex);
+        var id = data.id;
+        window.location.href="policy_detail.jsp?id="+ id;
+        console.log(data)
+	}) ;
+	$('#news_grid_2').on('rowclick', function (event) {
+        var args = event.args;
+        var boundIndex = args.rowindex;
+        var data = $('#news_grid_2').jqxGrid('getrowdata', boundIndex);
+        var id = data.id;
+        window.location.href="policy_detail.jsp?id="+ id;
+        console.log(data)
+	});
+	$('#news_grid_3').on('rowclick', function (event) {
+        var args = event.args;
+        var boundIndex = args.rowindex;
+        var data = $('#news_grid_3').jqxGrid('getrowdata', boundIndex);
+        var id = data.id;
+        window.location.href="policy_detail.jsp?id="+ id;
+        console.log(data)
+	});
+	$('#news_grid_4').on('rowclick', function (event) {
+        var args = event.args;
+        var boundIndex = args.rowindex;
+        var data = $('#news_grid_4').jqxGrid('getrowdata', boundIndex);
+        var id = data.id;
+        window.location.href="policy_detail.jsp?id="+ id;
+        console.log(data)
+	})
+	// $('#news_grid_2').jqxGrid(settings);
+	// $('#news_grid_3').jqxGrid(settings);
+	// $('#news_grid_4').jqxGrid(settings);
+
+    //获取url中的参数
+    function getUrlParam(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+        var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+        if (r != null) return decodeURI(r[2]); return null; //返回参数值
+    }
+    var tabIndex = getUrlParam('tabIndex');
+
+    $('#cat_tabs').jqxTabs({ selectedItem: tabIndex });
+
 });
 
 </script>
