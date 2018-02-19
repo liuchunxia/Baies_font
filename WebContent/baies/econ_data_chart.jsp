@@ -80,7 +80,7 @@ $(document).ready(function() {
 
     $.ajax({
         type:'GET',
-        url:'http://123.206.8.125:5000/quantify/socioeconomic_table',
+        url:'http://127.0.0.1:5000/quantify/socioeconomic_table',
         data: {},
         withCredentials: true,
         async: false,
@@ -99,7 +99,7 @@ $(document).ready(function() {
 
     $.ajax({
         type:'GET',
-        url:'http://123.206.8.125:5000/quantify/country',
+        url:'http://127.0.0.1:5000/quantify/country',
         data: {},
         withCredentials: true,
         async: false,

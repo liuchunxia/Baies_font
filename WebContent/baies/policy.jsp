@@ -31,7 +31,7 @@ $(document).ready(function() {
     $.ajax({
         type: "get",
         async: false,
-        url: "http://123.206.8.125:5000/qualitative/Post",
+        url: "http://127.0.0.1:5000/qualitative/Post",
         data: {},
         success: function (result) {
             var datas = result.data

@@ -44,7 +44,7 @@ var query_args = { country_ids:[], table_id:0, index_ids:[], start_time:'', end_
 
 $.ajax({
     type:'GET',
-    url:'http://123.206.8.125:5000/quantify/socioeconomic_table',
+    url:'http://127.0.0.1:5000/quantify/socioeconomic_table',
     data: {},
     withCredentials: true,
     async: false,
@@ -63,7 +63,7 @@ $.ajax({
 
 $.ajax({
     type:'GET',
-    url:'http://123.206.8.125:5000/quantify/country',
+    url:'http://127.0.0.1:5000/quantify/country',
     data: {},
     withCredentials: true,
     success: function (resp) {
