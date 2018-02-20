@@ -21,63 +21,151 @@ String jqx_theme = (String)request.getSession().getAttribute("jqx_theme");
 }
 </style>
 <script>
+    findArrayByValue = function (ary, value,func) {
+        for (var index in ary) {
+            if (func(ary[index], value) === true) {
+                console.log("compare",value)
+                return ary[index]
+            }
+        }
+        return {}
+    };
 
-page_id = 0;
+    var parseParam=function(param){
+        var paramStr="";
+        for (var key in param) {
+            paramStr = paramStr+ "&"+ key + '=' + JSON.stringify(param[key])
+        }
+        return paramStr.substr(1);
+    };
+
+
+    var myDate = new Date();
+    var start_year = 2005
+    var end_year = myDate.getFullYear()
+
+    var data = [];
+    <%--for (var i = 0; i < 100; i++) {--%>
+    <%--var row = rows[0];--%>
+    <%--var datarow = {};--%>
+    <%--datarow['version_id'] = 162 - i;--%>
+    <%--var objs = econ_data_cat_tree_src_<fmt:message key="common.language" />[0].items;--%>
+    <%--datarow['category'] = objs[Math.floor(Math.random()*objs.length)].label;--%>
+    <%--datarow['country'] = $(row).find('li:nth-child(3)').html();--%>
+    <%--datarow['author'] = $(row).find('li:nth-child(4)').html();--%>
+    <%--datarow['time'] = $(row).find('li:nth-child(5)').html();--%>
+    <%--datarow['description'] = $(row).find('li:nth-child(6)').find('span:nth-child('+(Math.floor(Math.random()*2)+1)+')').html();--%>
+    <%--datarow['operation'] = $(row).find('li:nth-child(7)').html();--%>
+    <%--data[data.length] = datarow;--%>
+    <%--}--%>
+
+    var source = {
+        localdata: data,
+        datatype: 'array',
+        datafields: [{name: 'id', type: 'number'},
+            {name: 'table_name', type: 'string', map:'table>cn_alis'},
+            {name: 'table_id', type: 'number', map:'table>id'},
+            {name: 'country', type: 'string', map:'country'},
+            {name: 'user', type: 'object', map: 'user>username'},
+            {name: 'time', type: 'string'},
+            {name: 'note', type: 'string'},
+            {name: 'operation', type: 'string'},
+            {name: 'pre_log_id', type: 'number'}
+        ],
+    };
+    var dataAdapter = new $.jqx.dataAdapter(source);
+    var settings = {
+        width: '850px',
+        source: dataAdapter,
+        autoheight: true,
+        autorowheight: true,
+        showheader: true,
+        pageable: true,
+        pagesize: 10,
+        theme: '<%=jqx_theme %>',
+        columns: [{text: '<fmt:message key="text.edition" />', dataField: 'id', width: 65, align: 'center', cellsalign: 'center'},
+            {text: '<fmt:message key="text.category" />', dataField: 'table_id',displayfield:'table_name', width: 160, align: 'center', cellsalign: 'center'},
+            {text: '<fmt:message key="common.dimension.country" />', dataField: 'country', width: 80, align: 'center', cellsalign: 'center'},
+            {text: '<fmt:message key="text.author" />', dataField: 'user', width: 80, align: 'center', cellsalign: 'center'},
+            {text: '<fmt:message key="common.dimension.time" />', dataField: 'time', width: 100, align: 'center', cellsalign: 'center'},
+            {text: '版本说明', dataField: 'note', width: 285, align: 'center'},
+            {text: '操作', dataField: 'operation', width: 80, align: 'center', cellsalign: 'center'}
+        ]
+    };
+
+
+var page_id = 0;
+
+
+var local_data_1 = [];
+var local_data_2 = [];
+var data_adapter_1;
+var data_adapter_2;
+
+var country_data = [];
 
 $(document).ready(function() {
-	
-	$('#nav2_tabs').jqxTabs({width: '998px', position: 'top', theme: '<%=jqx_theme %>'});
+
+    var rows = $("#data_ul");
+
+    $.ajax({
+        type:'GET',
+        url:'http://127.0.0.1:5000/quantify/country',
+        data: {},
+        withCredentials: true,
+        async: true,
+        success: function (resp) {
+            for (var index in resp.data) {
+                country_data.push(resp.data[index])
+            }
+            console.log(country_data,'r2')}.bind(this)
+    });
+
+    getAllLog = function () {
+        $.ajax({
+            type:'GET',
+            url:'http://127.0.0.1:5000/user/SocLog',
+            data:{},
+            withCredentials: true,
+            async: true,
+            success: function (resp) {
+                for (var index in resp.data) {
+                    var row = rows[0];
+                    var per_log = resp.data[index];
+                    var datarow = {}
+                    if (per_log.per_log_id === 0 ){
+                        continue
+                    }
+
+                    datarow["id"] = per_log.id
+
+                    datarow['table'] = per_log.table;
+                    datarow['country'] = per_log.user.country;
+                    datarow['user'] = per_log.user;
+                    datarow['time'] = per_log.timestamp;
+                    datarow['note'] = per_log.note;
+                    datarow['pre_log_id'] = per_log.per_log_id
+                    console.log(row)
+                    datarow['operation'] = $(row).find('li:nth-child(7)').html();
+                    data[data.length] = datarow;
+                }
+                dataAdapter.dataBind()
+                $('#data_grid').jqxGrid('render');
+                $('#data_grid').jqxGrid('refresh');
+            }
+        });
+    }
+
+
+    $('#nav2_tabs').jqxTabs({width: '998px', position: 'top', theme: '<%=jqx_theme %>'});
 	$('#nav2_tabs').jqxTabs({ selectedItem: 1 });
 	$('#nav2_tabs').on('selected', function (event) {
 		var idx = event.args.item;
 		window.location.href=nav2_items_approval[idx];
 	});
 	
-	var rows = $("#data_ul");
-	var data = [];
-	for (var i = 0; i < 100; i++) {
-		var row = rows[0];
-		var datarow = {};
-		datarow['version_id'] = 162 - i;
-		var objs = econ_data_cat_tree_src_<fmt:message key="common.language" />[0].items;
-		datarow['category'] = objs[Math.floor(Math.random()*objs.length)].label;
-		datarow['country'] = $(row).find('li:nth-child(3)').html();
-		datarow['author'] = $(row).find('li:nth-child(4)').html();
-		datarow['time'] = $(row).find('li:nth-child(5)').html();
-		datarow['description'] = $(row).find('li:nth-child(6)').find('span:nth-child('+(Math.floor(Math.random()*2)+1)+')').html();
-		datarow['operation'] = $(row).find('li:nth-child(7)').html();
-		data[data.length] = datarow;
-	}
-	var source = {
-			localdata: data,
-			datatype: 'array',
-			datafields: [{name: 'version_id', type: 'number'},
-			             {name: 'category', type: 'string'},
-			             {name: 'country', type: 'string'},
-			             {name: 'author', type: 'string'},
-			             {name: 'time', type: 'string'},
-			             {name: 'description', type: 'string'},
-			             {name: 'operation', type: 'string'}],
-	};
-	var dataAdapter = new $.jqx.dataAdapter(source);
-	var settings = {
-			width: '850px',
-			source: dataAdapter,
-			autoheight: true,
-			autorowheight: true,
-			showheader: true,
-			pageable: true,
-			pagesize: 10,
-			theme: '<%=jqx_theme %>',
-			columns: [{text: '<fmt:message key="text.edition" />', dataField: 'version_id', width: 65, align: 'center', cellsalign: 'center'},
-			          {text: '<fmt:message key="text.category" />', dataField: 'category', width: 160, align: 'center', cellsalign: 'center'},
-			          {text: '<fmt:message key="common.dimension.country" />', dataField: 'country', width: 80, align: 'center', cellsalign: 'center'},
-			          {text: '<fmt:message key="text.author" />', dataField: 'author', width: 80, align: 'center', cellsalign: 'center'},
-			          {text: '<fmt:message key="common.dimension.time" />', dataField: 'time', width: 100, align: 'center', cellsalign: 'center'},
-			          {text: '版本说明', dataField: 'description', width: 285, align: 'center'},
-			          {text: '操作', dataField: 'operation', width: 80, align: 'center', cellsalign: 'center'}
-			          ]
-	};
+
+
 	$('#data_grid').jqxGrid(settings);
 	
 	$('#dialog_window').jqxWindow({
@@ -92,10 +180,7 @@ $(document).ready(function() {
 		theme: '<%=jqx_theme %>'
 	});
 	
-	$('.detail_buttons').on('click', function() {
-		$('#diff_category').html('人口概况');
-		$('#diff_window').jqxWindow('open');
-	});
+
 	
 	$('.approve_buttons').on('click', function() {
 		$('#dialog_window_content').html('是否通过本信息？');
@@ -155,99 +240,21 @@ $(document).ready(function() {
 		         ]
 	});
 
+
+    getAllLog()
+
 	var init_diff_grid_widgets = function () {
-		
-		var local_data_1 = [
-		          		['<fmt:message key="common.country.brazil" />', '<fmt:message key="common.indicator.population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 18848 , 19070 , 19278 , 19477 , 19670 , 19861 ],
-		          		['<fmt:message key="common.country.russia" />', '<fmt:message key="common.indicator.population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 14362 , 14334 , 14318 , 14312 , 14313 , 14316 ],
-		          		['<fmt:message key="common.country.india" />', '<fmt:message key="common.indicator.population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 114433 , 116209 , 117969 , 119707 , 121418 , 123098 ],
-		          		['<fmt:message key="common.country.china" />', '<fmt:message key="common.indicator.population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 133562 , 134277 , 134994 , 135715 , 136441 , 137170 ],
-		          		['<fmt:message key="common.country.south_africa" />', '<fmt:message key="common.indicator.population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 4835 , 4903 , 4969 , 5035 , 5099 , 5162 ],
-		          		['<fmt:message key="common.country.brics" />', '<fmt:message key="common.indicator.population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 286040 , 288792 , 291528 , 294246 , 296941 , 299608 ],
-		          		['<fmt:message key="common.country.world" />', '<fmt:message key="common.indicator.population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 651964 , 660022 , 668161 , 676373 , 684648 , 692973 ],
-		          		['<fmt:message key="common.country.brazil" />', '<fmt:message key="common.indicator.male" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 9300 , 9406 , 9506 , 9601 , 9692 , 9783 ],
-		          		['<fmt:message key="common.country.russia" />', '<fmt:message key="common.indicator.male" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 6684 , 6664 , 6650 , 6643 , 6639 , 6639 ],
-		          		['<fmt:message key="common.country.india" />', '<fmt:message key="common.indicator.male" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 59310 , 60239 , 61160 , 62069 , 62962 , 63835 ],
-		          		['<fmt:message key="common.country.china" />', '<fmt:message key="common.indicator.male" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 68644 , 69022 , 69400 , 69779 , 70161 , 70546 ],
-		          		['<fmt:message key="common.country.south_africa" />', '<fmt:message key="common.indicator.male" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 2374 , 2407 , 2438 , 2470 , 2501 , 2532 ],
-		          		['<fmt:message key="common.country.brics" />', '<fmt:message key="common.indicator.male" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 146313 , 147738 , 149155 , 150561 , 151955 , 153336 ],
-		          		['<fmt:message key="common.country.world" />', '<fmt:message key="common.indicator.male" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 328508 , 332618 , 336766 , 340947 , 345159 , 349396 ],
-		          		['<fmt:message key="common.country.brazil" />', '<fmt:message key="common.indicator.female" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 9548 , 9663 , 9772 , 9876 , 9978 , 10078 ],
-		          		['<fmt:message key="common.country.russia" />', '<fmt:message key="common.indicator.female" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 7679 , 7670 , 7668 , 7670 , 7673 , 7677 ],
-		          		['<fmt:message key="common.country.india" />', '<fmt:message key="common.indicator.female" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 55122 , 55969 , 56808 , 57638 , 58456 , 59263 ],
-		          		['<fmt:message key="common.country.china" />', '<fmt:message key="common.indicator.female" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 64917 , 65254 , 65594 , 65936 , 66280 , 66624 ],
-		          		['<fmt:message key="common.country.south_africa" />', '<fmt:message key="common.indicator.female" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 2461 , 2496 , 2531 , 2565 , 2598 , 2630 ],
-		          		['<fmt:message key="common.country.brics" />', '<fmt:message key="common.indicator.female" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 139727 , 141054 , 142374 , 143685 , 144985 , 146272 ],
-		          		['<fmt:message key="common.country.world" />', '<fmt:message key="common.indicator.female" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 323455 , 327404 , 331395 , 335426 , 339489 , 343577 ],
-		          		['<fmt:message key="common.country.brazil" />', '<fmt:message key="common.indicator.uban_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 15419 , 15642 , 15855 , 16060 , 16262 , 16463 ],
-		          		['<fmt:message key="common.country.russia" />', '<fmt:message key="common.indicator.uban_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 10574 , 10564 , 10566 , 10574 , 10582 , 10583 ],
-		          		['<fmt:message key="common.country.india" />', '<fmt:message key="common.indicator.uban_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 32952 , 33806 , 34664 , 35529 , 36402 , 37290 ],
-		          		['<fmt:message key="common.country.china" />', '<fmt:message key="common.indicator.uban_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 58431 , 60577 , 62734 , 64934 , 67163 , 69426 ],
-		          		['<fmt:message key="common.country.south_africa" />', '<fmt:message key="common.indicator.uban_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 2872 , 2939 , 3007 , 3074 , 3139 , 3201 ],
-		          		['<fmt:message key="common.country.brics" />', '<fmt:message key="common.indicator.uban_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 120247 , 123528 , 126826 , 130171 , 133549 , 136963 ],
-		          		['<fmt:message key="common.country.world" />', '<fmt:message key="common.indicator.uban_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 319901 , 327140 , 334475 , 341942 , 349494 , 357127 ],
-		          		['<fmt:message key="common.country.brazil" />', '<fmt:message key="common.indicator.rural_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 3195 , 3171 , 3145 , 3117 , 3087 , 3058 ],
-		          		['<fmt:message key="common.country.russia" />', '<fmt:message key="common.indicator.rural_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 3820 , 3807 , 3799 , 3793 , 3787 , 3779 ],
-		          		['<fmt:message key="common.country.india" />', '<fmt:message key="common.indicator.rural_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 79763 , 80523 , 81245 , 81938 , 82611 , 83272 ],
-		          		['<fmt:message key="common.country.china" />', '<fmt:message key="common.indicator.rural_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 76396 , 75061 , 73737 , 72388 , 71022 , 69629 ],
-		          		['<fmt:message key="common.country.south_africa" />', '<fmt:message key="common.indicator.rural_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 1952 , 1953 , 1954 , 1953 , 1950 , 1944 ],
-		          		['<fmt:message key="common.country.brics" />', '<fmt:message key="common.indicator.rural_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 165125 , 164515 , 163879 , 163188 , 162458 , 161683 ],
-		          		['<fmt:message key="common.country.world" />', '<fmt:message key="common.indicator.rural_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 331508 , 332183 , 332835 , 333423 , 333978 , 334491 ],
-		          	                   ];
-		var local_data_2 = [
-		          		['<fmt:message key="common.country.brazil" />', '<fmt:message key="common.indicator.population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 18848 , 19071 , 19278 , 19477 , 19670 , 19861 ],
-		          		['<fmt:message key="common.country.russia" />', '<fmt:message key="common.indicator.population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 12345 , 14334 , 14318 , 14312 , 14313 , 14316 ],
-		          		['<fmt:message key="common.country.india" />', '<fmt:message key="common.indicator.population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 114433 , 116209 , 117969 , 119707 , 121418 , 123098 ],
-		          		['<fmt:message key="common.country.china" />', '<fmt:message key="common.indicator.population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 133562 , 134277 , 134994 , 135715 , 136441 , 137170 ],
-		          		['<fmt:message key="common.country.south_africa" />', '<fmt:message key="common.indicator.population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 4836 , 4904 , 4970 , 5035 , 5099 , 5162 ],
-		          		['<fmt:message key="common.country.brics" />', '<fmt:message key="common.indicator.population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 286040 , 288792 , 291528 , 294246 , 296941 , 299608 ],
-		          		['<fmt:message key="common.country.world" />', '<fmt:message key="common.indicator.population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 651964 , 660022 , 668161 , 676373 , 684648 , 692973 ],
-		          		['<fmt:message key="common.country.brazil" />', '<fmt:message key="common.indicator.male" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 9300 , 9406 , 9506 , 9601 , 9692 , 9783 ],
-		          		['<fmt:message key="common.country.russia" />', '<fmt:message key="common.indicator.male" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 6684 , 6664 , 6650 , 6643 , 6639 , 6639 ],
-		          		['<fmt:message key="common.country.india" />', '<fmt:message key="common.indicator.male" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 59310 , 60239 , 61160 , 62069 , 62962 , 63835 ],
-		          		['<fmt:message key="common.country.china" />', '<fmt:message key="common.indicator.male" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 68644 , 69022 , 69400 , 69779 , 70161 , 70546 ],
-		          		['<fmt:message key="common.country.south_africa" />', '<fmt:message key="common.indicator.male" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 2374 , 2407 , 2438 , 2470 , 2501 , 2532 ],
-		          		['<fmt:message key="common.country.brics" />', '<fmt:message key="common.indicator.male" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 146313 , 147738 , 149155 , 150561 , 151955 , 153336 ],
-		          		['<fmt:message key="common.country.world" />', '<fmt:message key="common.indicator.male" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 328508 , 332618 , 336766 , 340947 , 345159 , 349396 ],
-		          		['<fmt:message key="common.country.brazil" />', '<fmt:message key="common.indicator.female" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 9548 , 9663 , 9772 , 9876 , 9978 , 10078 ],
-		          		['<fmt:message key="common.country.russia" />', '<fmt:message key="common.indicator.female" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 7679 , 7670 , 7668 , 7670 , 7673 , 7677 ],
-		          		['<fmt:message key="common.country.india" />', '<fmt:message key="common.indicator.female" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 55122 , 55969 , 56808 , 57638 , 58456 , 59263 ],
-		          		['<fmt:message key="common.country.china" />', '<fmt:message key="common.indicator.female" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 64917 , 65254 , 65594 , 65936 , 66280 , 66624 ],
-		          		['<fmt:message key="common.country.south_africa" />', '<fmt:message key="common.indicator.female" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 2461 , 2496 , 2531 , 2565 , 2598 , 2630 ],
-		          		['<fmt:message key="common.country.brics" />', '<fmt:message key="common.indicator.female" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 139727 , 141054 , 142374 , 143685 , 144985 , 146272 ],
-		          		['<fmt:message key="common.country.world" />', '<fmt:message key="common.indicator.female" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 323455 , 327404 , 331395 , 335426 , 339489 , 343577 ],
-		          		['<fmt:message key="common.country.brazil" />', '<fmt:message key="common.indicator.uban_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 15419 , 15642 , 15855 , 16060 , 16262 , 16463 ],
-		          		['<fmt:message key="common.country.russia" />', '<fmt:message key="common.indicator.uban_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 10574 , 10564 , 10566 , 10574 , 10582 , 10583 ],
-		          		['<fmt:message key="common.country.india" />', '<fmt:message key="common.indicator.uban_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 32952 , 33806 , 34664 , 35529 , 36402 , 37290 ],
-		          		['<fmt:message key="common.country.china" />', '<fmt:message key="common.indicator.uban_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 58431 , 60577 , 62734 , 64934 , 67163 , 69426 ],
-		          		['<fmt:message key="common.country.south_africa" />', '<fmt:message key="common.indicator.uban_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 2872 , 2939 , 3007 , 3074 , 3139 , 3201 ],
-		          		['<fmt:message key="common.country.brics" />', '<fmt:message key="common.indicator.uban_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 120247 , 123528 , 126826 , 130171 , 133549 , 136963 ],
-		          		['<fmt:message key="common.country.world" />', '<fmt:message key="common.indicator.uban_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 319901 , 327140 , 334475 , 341942 , 349494 , 357127 ],
-		          		['<fmt:message key="common.country.brazil" />', '<fmt:message key="common.indicator.rural_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 3195 , 3171 , 3145 , 3117 , 3087 , 3058 ],
-		          		['<fmt:message key="common.country.russia" />', '<fmt:message key="common.indicator.rural_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 3820 , 3807 , 3799 , 3793 , 3787 , 3779 ],
-		          		['<fmt:message key="common.country.india" />', '<fmt:message key="common.indicator.rural_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 79763 , 80523 , 81245 , 81938 , 82611 , 83272 ],
-		          		['<fmt:message key="common.country.china" />', '<fmt:message key="common.indicator.rural_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 76396 , 75061 , 73737 , 72388 , 71022 , 69629 ],
-		          		['<fmt:message key="common.country.south_africa" />', '<fmt:message key="common.indicator.rural_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 1952 , 1953 , 1954 , 1953 , 1950 , 1944 ],
-		          		['<fmt:message key="common.country.brics" />', '<fmt:message key="common.indicator.rural_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 165125 , 164515 , 163879 , 163188 , 162458 , 161683 ],
-		          		['<fmt:message key="common.country.world" />', '<fmt:message key="common.indicator.rural_population" /> (<fmt:message key="common.unit.ten_thousand_people" />)', 331508 , 332183 , 332835 , 333423 , 333978 , 334491 ],
-		          	                   ];
+
+
+
 		var data_fields = [
-		                   {name: 'location', type: 'string', map: '0'},
-		                   {name: 'variable', type: 'string', map: '1'},
-		                   {name: 'y2005', type: 'number', map: '2'},
-		                   {name: 'y2006', type: 'number', map: '3'},
-		                   {name: 'y2007', type: 'number', map: '4'},
-		                   {name: 'y2008', type: 'number', map: '5'},
-		                   {name: 'y2009', type: 'number', map: '6'},
-		                   {name: 'y2010', type: 'number', map: '7'}
-		                   ];
-		var grid_edited_cells = [
-		                         {row: 0, datafield: 'y2006'},
-		                         {row: 1, datafield: 'y2005'},
-		                         {row: 4, datafield: 'y2005'},
-		                         {row: 4, datafield: 'y2006'},
-		                         {row: 4, datafield: 'y2007'},
-		                         ];
+            {name: 'location', type: 'string', map: 'location'},
+            {name: 'variable', type: 'string', map: 'variable'},
+            {name: 'country_id', type:'number',map: 'country_id'},
+            {name: 'index_id', type:'number', map:'index_id'}
+		];
+		var grid_edited_cells = [];
+
 		var grid_cell_class = function (row, datafield, value, rowdata) {
 			for (var i = 0; i < grid_edited_cells.length; i++) {
 				if(grid_edited_cells[i].row == row && grid_edited_cells[i].datafield == datafield) {
@@ -257,14 +264,16 @@ $(document).ready(function() {
 		};
 		var data_columns = [
 		                   {text: '<fmt:message key="common.dimension.country" />', datafield: 'location', width: 50},
-		                   {text: '<fmt:message key="common.dimension.indicator" />', datafield: 'variable', width: 70},
-		                   {text: '2005', datafield: 'y2005', width: 70, cellsalign: 'right', cellclassname: grid_cell_class},
-		                   {text: '2006', datafield: 'y2006', width: 70, cellsalign: 'right', cellclassname: grid_cell_class},
-		                   {text: '2007', datafield: 'y2007', width: 70, cellsalign: 'right', cellclassname: grid_cell_class},
-		                   {text: '2008', datafield: 'y2008', width: 70, cellsalign: 'right', cellclassname: grid_cell_class},
-		                   {text: '2009', datafield: 'y2009', width: 70, cellsalign: 'right', cellclassname: grid_cell_class},
-		                   {text: '2010', datafield: 'y2010', width: 70, cellsalign: 'right', cellclassname: grid_cell_class}
+		                   {text: '<fmt:message key="common.dimension.indicator" />', datafield: 'variable', width: 70}
 		               ];
+
+        for (var year = start_year ,t= 0; year<=end_year; year++,t++) {
+			data_fields.push({name: 'y'+year, type: 'object', map: 'y'+year.toString()+'>value'})
+            data_columns.push({text: year.toString(), datafield: 'y'+year,  width: 70, cellsalign: 'right', cellclassname: grid_cell_class})
+            grid_edited_cells.push({row: t, datafield: 'y'+year.toString()+'>value'})
+        }
+        console.log("年填充完成",grid_edited_cells,data_fields, data_columns)
+
 		var data_source_1 = {
 				localdata: local_data_1,
 				datafields: data_fields,
@@ -275,18 +284,232 @@ $(document).ready(function() {
 				datafields: data_fields,
 				datatype: 'array'
 		};
-		var data_adapter_1 = new $.jqx.dataAdapter(data_source_1);
-		var data_adapter_2 = new $.jqx.dataAdapter(data_source_2);
+		data_adapter_1 = new $.jqx.dataAdapter(data_source_1);
+		data_adapter_2 = new $.jqx.dataAdapter(data_source_2);
 		$('#diff_grid_1').jqxGrid({
 			width: '330px', height: '400px', source: data_adapter_1, columnsresize: true, columns: data_columns, theme: '<%=jqx_theme %>'
 		});
 		$('#diff_grid_2').jqxGrid({
 			width: '330px', height: '400px', source: data_adapter_2, columnsresize: true, columns: data_columns, theme: '<%=jqx_theme %>'
 		});
-		
 	};
 	init_diff_grid_widgets();
-	
+
+
+    $("#data_grid").on("cellclick", function (event)
+    {
+        // event arguments.
+        var args = event.args;
+
+        var log = args.row.bounddata;
+        console.log(args)
+
+
+        $('.detail_buttons').on('click', function() {
+            $('#diff_category').html(log.table_name);
+
+            $('#dialog_window').one('close', function(event) {
+                if(event.args.dialogResult.OK) {
+
+                    var post_data = {
+                        
+					}
+
+                    $.ajax({
+                        async: true,
+                        crossDomain: true,
+                        processData: false,
+                        url: "http://127.0.0.1:5000/quantify/socioeconomic_table",
+                        method: "PUT",
+                        data: JSON.stringify(post_data),
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Cache-Control": "no-cache"
+                        },
+                        success: function (resp) {
+                            console.log(resp);
+                            $('#message_notification_content').html('修订版本已保存。');
+                            $('#message_notification').jqxNotification('open');
+                            window.location.reload();
+                        }
+                    })
+                }
+                else {
+
+				}
+            });
+
+            $('#diff_window').jqxWindow('open');
+            local_data_1.splice(0,local_data_1.length)
+            local_data_2.splice(0,local_data_2.length)
+            var cur_indexes = [];
+
+
+
+            $.ajax({
+                async: true,
+                crossDomain: true,
+                url: "http://127.0.0.1:5000/quantify/socioeconomic_table/"+log.table_id+"/indexes",
+                method: "GET",
+                data: {},
+                success: function (resp) {
+					cur_indexes = resp.data
+					console.log(cur_indexes)
+
+                    var query_args = {
+                        country_ids: country_data.map(function (x) {
+                            return x.id
+                        }),
+                        table_id: log.table_id,
+                        index_ids: cur_indexes.map(function (x) {
+                            return x.id
+                        }),
+                        start_time: start_year,
+						end_time: end_year,
+						log_id: log.id
+                    }
+
+                    $.ajax({
+                        type:'GET',
+                        url:'http://127.0.0.1:5000/quantify/socioeconomic_facts'+'?'+ parseParam(query_args),
+                        data: {},
+                        withCredentials: true,
+                        async: true,
+                        success: function (resp) {
+
+                            for (var index_id_i in query_args.index_ids) {
+                                var index_id = query_args.index_ids[index_id_i]
+                                for (var country_id_i in query_args.country_ids) {
+                                    var country_id = query_args.country_ids[country_id_i]
+
+                                    var datas = findArrayByValue(
+                                        resp.data, {"index_id":index_id, "country_id":country_id},
+                                        function (x,y) {
+                                            if (x.country.id === y["country_id"] && x.index.id === y["index_id"]) {
+                                                return true
+                                            }
+                                            return false
+                                        }
+                                    ).data
+
+                                    console.log("fill datas", datas)
+
+                                    var line = {
+                                        location:
+                                        findArrayByValue(country_data,
+                                            country_id,
+                                            function (x,y) {
+                                                if (x.id === y) {
+                                                    return true
+                                                }
+                                                return false
+                                            }
+                                        ).name,
+                                        variable: findArrayByValue(cur_indexes,
+                                            index_id,
+                                            function (x,y) {
+                                                if (x.id === y) {
+                                                    return true
+                                                }
+                                                return false
+                                            }
+                                        ).name,
+                                        country_id: country_id,
+                                        index_id: index_id}
+
+                                    for (var data_i in datas) {
+                                        var tmp_data = datas[data_i];
+                                        console.log("当数据是",[country_id, index_id], "填充",tmp_data)
+                                        line['y'+tmp_data.time] = {value:tmp_data.value, id:tmp_data.id}
+                                    }
+                                    console.log("填充完成",line)
+                                    local_data_1.push(line)
+
+                                }
+                            }
+
+                            console.log('local',resp.data)
+                            data_adapter_1.dataBind()
+                            $('#diff_grid_1').jqxGrid('render');
+                            $('#diff_grid_1').jqxGrid('refresh');
+                        }
+                    });
+
+                    query_args.log_id = log.pre_log_id
+
+                    $.ajax({
+                        type:'GET',
+                        url:'http://127.0.0.1:5000/quantify/socioeconomic_facts'+'?'+ parseParam(query_args),
+                        data: {},
+                        withCredentials: true,
+                        async: true,
+                        success: function (resp) {
+
+                            for (var index_id_i in query_args.index_ids) {
+                                var index_id = query_args.index_ids[index_id_i]
+                                for (var country_id_i in query_args.country_ids) {
+                                    var country_id = query_args.country_ids[country_id_i]
+
+                                    var datas = findArrayByValue(
+                                        resp.data, {"index_id":index_id, "country_id":country_id},
+                                        function (x,y) {
+                                            if (x.country.id === y["country_id"] && x.index.id === y["index_id"]) {
+                                                return true
+                                            }
+                                            return false
+                                        }
+                                    ).data
+
+                                    console.log("fill datas", datas)
+
+                                    var line = {
+                                        location:
+                                        findArrayByValue(country_data,
+                                            country_id,
+                                            function (x,y) {
+                                                if (x.id === y) {
+                                                    return true
+                                                }
+                                                return false
+                                            }
+                                        ).name,
+                                        variable: findArrayByValue(cur_indexes,
+                                            index_id,
+                                            function (x,y) {
+                                                if (x.id === y) {
+                                                    return true
+                                                }
+                                                return false
+                                            }
+                                        ).name,
+                                        country_id: country_id,
+                                        index_id: index_id}
+
+                                    for (var data_i in datas) {
+                                        var tmp_data = datas[data_i];
+                                        console.log("当数据是",[country_id, index_id], "填充",tmp_data)
+                                        line['y'+tmp_data.time] = {value:tmp_data.value, id:tmp_data.id}
+                                    }
+                                    console.log("填充完成",line)
+                                    local_data_2.push(line)
+
+                                }
+                            }
+
+                            console.log('local',resp.data)
+                            data_adapter_2.dataBind()
+                            $('#diff_grid_2').jqxGrid('render');
+                            $('#diff_grid_2').jqxGrid('refresh');
+                        }
+                    });
+
+                }
+            })
+
+        });
+
+    });
+
 });
 
 </script>
@@ -343,14 +566,6 @@ $(document).ready(function() {
 			<img class="detail_buttons" src="../js/jqwidgets-4.1.2/styles/images/search.png"
 				title="查看" style="width: 16px; height: 16px; vertical-align: middle;">
 		</button>
-		<button>
-			<img class="approve_buttons" src="../js/jqwidgets-4.1.2/styles/images/check_black.png"
-				title="通过" style="width: 16px; height: 16px; vertical-align: middle;">
-		</button>
-		<button>
-			<img class="reject_buttons" src="../js/jqwidgets-4.1.2/styles/images/close_black.png"
-				title="拒绝" style="width: 16px; height: 16px; vertical-align: middle;">
-		</button>
 	</li>
 </ul>
 
@@ -359,8 +574,8 @@ $(document).ready(function() {
 	<div style="overflow: hidden;">
 		<div id="dialog_window_content" style="margin: 20px;">&nbsp;</div>
 		<div class="right margin_10">
-			<input type="button" id="dialog_window_ok_button" value="确定">
-			<input type="button" id="dialog_window_cancel_button" value="取消">
+			<input type="button" id="dialog_window_ok_button" value="切换当前版本">
+			<input type="button" id="dialog_window_cancel_button" value="回到上一版本">
 		</div>
 		<div class="clear"></div>
 	</div>
@@ -374,8 +589,8 @@ $(document).ready(function() {
 		<div class="clear"></div>
 		<div class="margin_10"></div>
 		<div style="width: 100%; height: 20px;">
-			<div class="left" style="margin-left: 50px;">原始版</div>
-			<div class="right" style="margin-right: 50px;">修订版</div>
+			<div class="left" style="margin-left: 50px;">修订版</div>
+			<div class="right" style="margin-right: 50px;">原始版</div>
 			<div class="clear"></div>
 		</div>
 		<div id="diff_content_splitter">

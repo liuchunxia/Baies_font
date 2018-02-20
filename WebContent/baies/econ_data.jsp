@@ -18,7 +18,7 @@ String jqx_theme = (String)request.getSession().getAttribute("jqx_theme");
 <script>
 
 page_id = 2;
-
+var myDate = new Date();
 removeByValue = function(ary,val) {
     var index = ary.indexOf(val);
     if (index > -1) {
@@ -44,7 +44,7 @@ var query_args = { country_ids:[], table_id:0, index_ids:[], start_time:'', end_
 
 $.ajax({
     type:'GET',
-    url:'http://123.206.8.125:5000/quantify/socioeconomic_table',
+    url:'http://127.0.0.1:5000/quantify/socioeconomic_table',
     data: {},
     withCredentials: true,
     async: false,
@@ -63,7 +63,7 @@ $.ajax({
 
 $.ajax({
     type:'GET',
-    url:'http://123.206.8.125:5000/quantify/country',
+    url:'http://127.0.0.1:5000/quantify/country',
     data: {},
     withCredentials: true,
     success: function (resp) {
@@ -112,7 +112,7 @@ $(document).ready(function() {
 	});
 	
 	$('#time_slider').jqxSlider({
-		width: '95%', values: [2005, 2010], min: 2000, max: 2016, mode: 'fixed',
+		width: '95%', values: [2005, 2010], min: 2000, max: myDate.getFullYear(), mode: 'fixed',
 		rangeSlider: true, theme: '<%=jqx_theme %>', ticksFrequency: 1
 	});
 	
@@ -173,7 +173,7 @@ $(document).ready(function() {
     })
     var values = $('#time_slider').jqxSlider('values');
     query_args.start_time = values[0];
-    query_args.end_time = values[1].toString();
+    query_args.end_time = values[1];
 
     $('#time_slider').on('change', function (event) {
         var values = $('#time_slider').jqxSlider('values');

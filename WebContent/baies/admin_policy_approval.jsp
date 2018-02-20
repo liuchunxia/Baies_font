@@ -168,7 +168,7 @@ $(document).ready(function() {
 		});
 		$('#dialog_window').jqxWindow('open');
 	});
-	
+
 	$('.reject_buttons').on('click', function() {
 		$('#dialog_window_content').html('是否拒绝本信息？');
 		$('#dialog_window').one('close', function(event) {

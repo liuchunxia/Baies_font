@@ -19,9 +19,9 @@ String jqx_theme = (String)request.getSession().getAttribute("jqx_theme");
 
 page_id = 2;
 
+var myDate = new Date();
 
-
-removeByValue = function(ary,val) {
+	removeByValue = function(ary,val) {
     var index = ary.indexOf(val);
     if (index > -1) {
         ary.splice(index, 1);
@@ -36,6 +36,14 @@ findArrayByValue = function (ary, value,func) {
     }
     return {}
 }
+
+var parseParam=function(param){
+    var paramStr="";
+    for (var key in param) {
+        paramStr = paramStr+ "&"+ key + '=' + JSON.stringify(param[key])
+    }
+    return paramStr.substr(1);
+};
 
 function getQueryString() {
     var qs = location.search.substr(1), // 获取url中"?"符后的字串
@@ -82,13 +90,13 @@ var data_source = {
 var data_adapter = new $.jqx.dataAdapter(data_source);
 
 $(document).ready(function() {
-	
+    old_query_args = getQueryString();
 	var cat_tree_src = econ_data_cat_tree_src_<fmt:message key="common.language" />;
 
 
     $.ajax({
         type:'GET',
-        url:'http://123.206.8.125:5000/quantify/socioeconomic_table',
+        url:'http://127.0.0.1:5000/quantify/socioeconomic_table',
         data: {},
         withCredentials: true,
         async: false,
@@ -107,7 +115,7 @@ $(document).ready(function() {
 
     $.ajax({
         type:'GET',
-        url:'http://123.206.8.125:5000/quantify/country',
+        url:'http://127.0.0.1:5000/quantify/country',
         data: {},
         withCredentials: true,
         async: false,
@@ -151,12 +159,12 @@ $(document).ready(function() {
 	$('#variable_expander').jqxExpander({
 		width: '170px', showArrow: false, toggleMode: 'none', theme: '<%=jqx_theme %>'
 	});
-	
-	$('#variable_list').jqxDropDownList({
-		source: index_data, checkboxes: true,
-		width: '100%', theme: '<%=jqx_theme %>',
-        displayMember:"label",valueMember:"value"
-	});
+
+    $('#variable_list').jqxDropDownList({
+        source: index_data, checkboxes: true,
+        width: '100%', theme: '<%=jqx_theme %>',
+        displayMember:"name",valueMember:"id"
+    });
 	
 	// $("#variable_list").jqxDropDownList('checkIndex', 0);
 	// $("#variable_list").jqxDropDownList('checkIndex', 1);
@@ -166,7 +174,7 @@ $(document).ready(function() {
 
 	
 	$('#time_slider').jqxSlider({
-		width: '220px', values: [2005, 2010], min: 2000, max: 2016, mode: 'fixed',
+		width: '220px', values: [2005, 2010], min: 2000, max:myDate.getFullYear(), mode: 'fixed',
 		rangeSlider: true, theme: '<%=jqx_theme %>', ticksFrequency: 1
 	});
 	
@@ -180,7 +188,8 @@ $(document).ready(function() {
 	});
 	
 	$('#query_button').on('click', function() {
-		//window.location.href='econ_data_table.jsp';
+		window.location.href='econ_data_table.jsp'+'?'+ parseParam(query_args);
+		window.location.reload()
 	});
 	
 	$('#chart_button').jqxButton({
@@ -188,18 +197,22 @@ $(document).ready(function() {
 	});
 	
 	$('#chart_button').on('click', function() {
-		window.location.href='econ_data_chart.jsp';
+		window.location.href='econ_data_chart.jsp'+parseParam(old_query_args);
 	});
 	
 	$('#export_button').jqxButton({
 		width: '100px', height: '47px', theme: '<%=jqx_theme %>'
 	});
-	
 
-	$('#data_grid').jqxGrid({
+    $('#export_button').on('click', function () { $("#data_grid").jqxGrid('exportdata', 'xls', '经济数据');});
+
+
+
+    $('#data_grid').jqxGrid({
 		width: '650px', height: '270px', source: data_adapter, columnsresize: true,
 		columns: data_columns, theme: '<%=jqx_theme %>'
 	});
+
 
     // 处理事件
     $('#cat_tree').on('select',function (event)
@@ -209,9 +222,9 @@ $(document).ready(function() {
 
         query_args.table_id=item.value
         index_data.splice(0,index_data.length);
-        query_args.index_ids=[]
+        query_args.index_ids.length=0
         for (var i in table_index_data[item.id]) {
-            index_data.push({label:table_index_data[item.id][i].name, value:table_index_data[item.id][i].id, id:table_index_data[item.id][i].id})
+            index_data.push(table_index_data[item.id][i])
         }
         console.log('qu', query_args)
         $("#variable_list").jqxDropDownList('render');
@@ -221,53 +234,76 @@ $(document).ready(function() {
         var args = event.args;
         console.log(args)
         var item = $('#variable_list').jqxDropDownList('getItem', args.index);
+        console.log("指标选择开始",item)
         if (item.checked === true) {
+            console.log("指标选择")
             query_args.index_ids.push(item.value)
         }
         else {
+            console.log("指标删除")
             removeByValue(query_args.index_ids,item.value)
         }
         console.log('qu', query_args)
     })
 
 
+
+
     $('#location_list').on('select', function (event) {
         var args = event.args;
         var item = $('#location_list').jqxDropDownList('getItem', args.index);
+        console.log("国家选择开始s",item)
+
         if (item.checked === true) {
-            query_args.country_ids.push(item.id)
+            query_args.country_ids.push(item.value)
+			console.log("国家选择")
         }
         else {
-            removeByValue(query_args.country_ids,item.id)
+            console.log("国家取消")
+            removeByValue(query_args.country_ids,item.value)
         }
         console.log('qu', query_args)
     })
-    // var values = $('#time_slider').jqxSlider('values');
-    // query_args.start_time = values[0].toString();
-    // query_args.end_time = values[1].toString();
-
-    // $('#time_slider').on('change', function (event) {
-    //     var values = $('#time_slider').jqxSlider('values');
-    //     query_args.start_time = values[0]
-    //     query_args.end_time = values[1]
-    //     console.log('qu', query_args)
-    // });
-
-    $('#cat_tree').jqxTree('selectItem',$("#cat_tree").find('li:first')[0])
 
 
+    $('#time_slider').on('change', function (event) {
+        var values = $('#time_slider').jqxSlider('values');
+        query_args.start_time = values[0]
+        query_args.end_time = values[1]
+        console.log('qu', query_args)
+    });
+
+    // chekc
     var checked_variable_list_func = function () {
+
+        $('#cat_tree').jqxTree('selectItem',$("#cat_tree").find('li:first')[0])
+
+		// for (var index_id_i in old_query_args.index_ids) {
+         //    var index_id = old_query_args.index_ids[index_id_i]
+		// 	query_args.index_ids.push(index_id)
+		// }
+		console.log("清空")
+		query_args.country_ids.length = 0
         for (var country_id_i in old_query_args.country_ids) {
             var country_id = old_query_args.country_ids[country_id_i]
             $("#location_list").jqxDropDownList('checkItem',  $("#location_list").jqxDropDownList('getItemByValue',  country_id));
+            $("#location_list").jqxDropDownList('selectItem',  $("#location_list").jqxDropDownList('getItemByValue',  country_id));
+
         }
 
         for (var index_id_i in old_query_args.index_ids) {
             var index_id = old_query_args.country_ids[index_id_i]
+
             $("#variable_list").jqxDropDownList('checkItem',  $("#variable_list").jqxDropDownList('getItemByValue',  index_id));
+            $("#variable_list").jqxDropDownList('selectItem',  $("#variable_list").jqxDropDownList('getItemByValue',  index_id));
+
         }
 
+        $('#time_slider').jqxSlider('setValue', [old_query_args.start_time, old_query_args.end_time]);
+
+
     }()
+
 
     var tmp = function init_data_columns () {
         for (var year = old_query_args.start_time;year<=old_query_args.end_time; year++){
@@ -279,7 +315,7 @@ $(document).ready(function() {
         console.log("PUll data")
         $.ajax({
             type:'GET',
-            url:'http://123.206.8.125:5000/quantify/socioeconomic_facts'+location.search,
+            url:'http://127.0.0.1:5000/quantify/socioeconomic_facts'+location.search,
             data: {},
             withCredentials: true,
             async: true,
@@ -287,30 +323,21 @@ $(document).ready(function() {
 
                 for (var index_id_i in old_query_args.index_ids) {
                     var index_id = old_query_args.index_ids[index_id_i]
-                    var tmp_same_index_data = findArrayByValue(
-                        resp.data,
-                        index_id,
-                        function (x,y) {
-                            if (x.index.id === y) {
-                                return true
-                            }
-                            return false
-                        })
-
-                    console.log("tmp_same_index_data",tmp_same_index_data)
                     for (var country_id_i in old_query_args.country_ids) {
                         var country_id = old_query_args.country_ids[country_id_i]
-                        var tmp_same_country_data = findArrayByValue(
-                            tmp_same_index_data.data,
-                            country_id,
+
+                        var datas = findArrayByValue(
+                            resp.data, {"index_id":index_id, "country_id":country_id},
                             function (x,y) {
-                                if (x.country.id === y) {
+                                if (x.country.id === y["country_id"] && x.index.id === y["index_id"]) {
                                     return true
                                 }
                                 return false
-                            }).data
+                            }
+                        ).data
 
-                        console.log("tmp_same_country_data",tmp_same_country_data)
+                        console.log("fill datas", datas)
+
                         var line = {
                             location:
                             findArrayByValue(country_data,
@@ -332,20 +359,18 @@ $(document).ready(function() {
                                 }
                             ).name,
                             country_id: country_id,
-                            index_id: index_id
-                        }
-                        for (var tmp_data_i in tmp_same_country_data) {
-                            var tmp_data = tmp_same_country_data[tmp_data_i]
-                            console.log('fill_data',tmp_data)
+                            index_id: index_id}
+
+                        for (var data_i in datas) {
+                            var tmp_data = datas[data_i];
+                            console.log("当数据是",[country_id, index_id], "填充",tmp_data)
                             line['y'+tmp_data.time] = {value:tmp_data.value, id:tmp_data.id}
                         }
-
+                        console.log("填充完成",line)
                         local_data.push(line)
-                        console.log('line',line)
+
                     }
                 }
-
-
                 console.log('local',local_data)
                 data_adapter.dataBind()
                 $('#data_grid').jqxGrid('render');
