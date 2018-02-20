@@ -50,7 +50,7 @@ String jqx_theme = (String)request.getSession().getAttribute("jqx_theme");
         success: function (resp) {
             for (var table in resp.data) {
                 console.log('table', resp.data[table])
-                table_data.push({label: resp.data[table].name, value: resp.data[table].id, id:resp.data[table].id})
+                table_data.push({label: resp.data[table].<fmt:message key="data.field" />, value: resp.data[table].id, id:resp.data[table].id})
                 table_index_data[resp.data[table].id] = resp.data[table].indexes
             }
             console.log('table', table_data, 'index', table_index_data)
@@ -67,7 +67,7 @@ String jqx_theme = (String)request.getSession().getAttribute("jqx_theme");
         withCredentials: true,
         success: function (resp) {
             for (var index in resp.data) {
-                country_data.push({label:resp.data[index].name, value:resp.data[index].id, id: resp.data[index].name})
+                country_data.push({label:resp.data[index].<fmt:message key="data.field" />, value:resp.data[index].id, id: resp.data[index].id})
             }
             $('#location_list').jqxListBox('refresh')
 
@@ -138,7 +138,7 @@ String jqx_theme = (String)request.getSession().getAttribute("jqx_theme");
             index_data.splice(0,index_data.length);
             query_args.index_ids=[]
             for (var i in table_index_data[item.id]) {
-                index_data.push({label:table_index_data[item.id][i].name, value:table_index_data[item.id][i].id, id:table_index_data[item.id][i].id})
+                index_data.push({label:table_index_data[item.id][i].<fmt:message key="data.field" />, value:table_index_data[item.id][i].id, id:table_index_data[item.id][i].id})
             }
             $('#variable_list').jqxListBox('refresh')
             console.log('qu', query_args)

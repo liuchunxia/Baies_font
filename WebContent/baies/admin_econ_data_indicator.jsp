@@ -32,7 +32,7 @@ $.ajax({
     success: function (resp) {
         for (var table in resp.data) {
             console.log('table', resp.data[table])
-            table_data.push({label: resp.data[table].name, value: resp.data[table].id, id:resp.data[table].id})
+            table_data.push({label: resp.data[table].<fmt:message key="data.field" />, value: resp.data[table].id, id:resp.data[table].id})
             table_index_data[resp.data[table].id] = resp.data[table].indexes
         }
         console.log('table', table_data, 'index', table_index_data)
@@ -302,7 +302,7 @@ $(document).ready(function() {
 
         index_data.splice(0,index_data.length);
         for (var i in table_index_data[item.id]) {
-            index_data.push({label:table_index_data[item.id][i].name, value:table_index_data[item.id][i].id, id:table_index_data[item.id][i].id})
+            index_data.push({label:table_index_data[item.id][i].<fmt:message key="data.field" />, value:table_index_data[item.id][i].id, id:table_index_data[item.id][i].id})
         }
         $('#variable_list').jqxListBox('refresh')
         console.log("change", index_data)

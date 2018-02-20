@@ -87,7 +87,7 @@ $(document).ready(function() {
         success: function (resp) {
             for (var table in resp.data) {
                 console.log('table', resp.data[table])
-                table_data.push({label: resp.data[table].name, value: resp.data[table].id, id:resp.data[table].id})
+                table_data.push({label: resp.data[table].<fmt:message key="data.field" />, value: resp.data[table].id, id:resp.data[table].id})
                 table_index_data[resp.data[table].id] = resp.data[table].indexes
             }
             console.log('table', table_data, 'index', table_index_data)
@@ -284,13 +284,13 @@ $(document).ready(function() {
 
 				for (var conuntry_i in old_query_args.country_ids) {
                     var country = country_data[conuntry_i]
-					group_source.push({dataField: country.name, displayText: country.name, symbolType: 'circle'})
+					group_source.push({dataField: country.<fmt:message key="data.field" />, displayText: country.<fmt:message key="data.field" />, symbolType: 'circle'})
 				}
 
                 for (var index_i in resp.data) {
                     var index = resp.data[index_i].index
 					console.log("获取idnex", index)
-					chart_title = index.name +"数据"
+					chart_title = index.<fmt:message key="data.field" /> +"数据"
 					var same_index_series = resp.data[index_i].series
                     console.log("获取same_idnex", same_index_series)
                     for (var same_country_series_i in same_index_series) {
@@ -307,7 +307,7 @@ $(document).ready(function() {
 								}
 								return false
                             })
-							line[country.name] = data.y
+							line[country.<fmt:message key="data.field" />] = data.y
 						}
 					}
 

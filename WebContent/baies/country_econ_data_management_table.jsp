@@ -108,7 +108,7 @@ $(document).ready(function() {
         success: function (resp) {
             for (var table in resp.data) {
                 console.log('table', resp.data[table])
-                table_data.push({label: resp.data[table].name, value: resp.data[table].id, id:resp.data[table].id})
+                table_data.push({label: resp.data[table].<fmt:message key="data.field" />, value: resp.data[table].id, id:resp.data[table].id})
                 table_index_data[resp.data[table].id] = resp.data[table].indexes
             }
             console.log('table', table_data, 'index', table_index_data)
@@ -152,7 +152,7 @@ $(document).ready(function() {
     $('#location_list').jqxDropDownList({
         source: country_data, checkboxes: true,
         width: '100%', theme: '<%=jqx_theme %>',
-        displayMember:"name",valueMember:"id"
+        displayMember:'<fmt:message key="data.field" />',valueMember:"id"
     });
 	
 	$("#location_list").jqxDropDownList('checkIndex', 0);
@@ -170,7 +170,7 @@ $(document).ready(function() {
     $('#variable_list').jqxDropDownList({
         source: index_data, checkboxes: true,
         width: '100%', theme: '<%=jqx_theme %>',
-        displayMember:"name",valueMember:"id"
+        displayMember:'<fmt:message key="data.field" />',valueMember:"id"
     });
 	
 	$("#variable_list").jqxDropDownList('checkIndex', 0);
@@ -442,7 +442,7 @@ $(document).ready(function() {
                                     }
                                     return false
                                 }
-                            ).name,
+                            ).<fmt:message key="data.field" />,
                             variable: findArrayByValue(index_data,
                                 index_id,
                                 function (x,y) {
@@ -451,7 +451,7 @@ $(document).ready(function() {
                                     }
                                     return false
                                 }
-                            ).name,
+                            ).<fmt:message key="data.field" />,
                             country_id: country_id,
                             index_id: index_id}
 

@@ -321,7 +321,6 @@ $(document).ready(function() {
                     $.ajax({
                         async: true,
                         crossDomain: true,
-                        processData: false,
                         withCredentials: true,
                         url: "http://127.0.0.1:5000/quantify/socioeconomic_table",
                         method: "PUT",
@@ -424,7 +423,7 @@ $(document).ready(function() {
                                                 }
                                                 return false
                                             }
-                                        ).name,
+                                        ).<fmt:message key="data.field" />,
                                         variable: findArrayByValue(cur_indexes,
                                             index_id,
                                             function (x,y) {
@@ -433,7 +432,7 @@ $(document).ready(function() {
                                                 }
                                                 return false
                                             }
-                                        ).name,
+                                        ).<fmt:message key="data.field" />,
                                         country_id: country_id,
                                         index_id: index_id}
 
@@ -492,7 +491,7 @@ $(document).ready(function() {
                                                 }
                                                 return false
                                             }
-                                        ).name,
+                                        ).<fmt:message key="data.field" />,
                                         variable: findArrayByValue(cur_indexes,
                                             index_id,
                                             function (x,y) {
@@ -501,7 +500,7 @@ $(document).ready(function() {
                                                 }
                                                 return false
                                             }
-                                        ).name,
+                                        ).<fmt:message key="data.field" />,
                                         country_id: country_id,
                                         index_id: index_id}
 
