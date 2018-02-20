@@ -307,10 +307,43 @@ $(document).ready(function() {
 
         $('.detail_buttons').on('click', function() {
             $('#diff_category').html(log.table_name);
+
+            $('#dialog_window').one('close', function(event) {
+                if(event.args.dialogResult.OK) {
+
+                    var post_data = {
+                        
+					}
+
+                    $.ajax({
+                        async: true,
+                        crossDomain: true,
+                        processData: false,
+                        url: "http://127.0.0.1:5000/quantify/socioeconomic_table",
+                        method: "PUT",
+                        data: JSON.stringify(post_data),
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Cache-Control": "no-cache"
+                        },
+                        success: function (resp) {
+                            console.log(resp);
+                            $('#message_notification_content').html('修订版本已保存。');
+                            $('#message_notification').jqxNotification('open');
+                            window.location.reload();
+                        }
+                    })
+                }
+                else {
+
+				}
+            });
+
             $('#diff_window').jqxWindow('open');
             local_data_1.splice(0,local_data_1.length)
             local_data_2.splice(0,local_data_2.length)
             var cur_indexes = [];
+
 
 
             $.ajax({
@@ -533,12 +566,6 @@ $(document).ready(function() {
 			<img class="detail_buttons" src="../js/jqwidgets-4.1.2/styles/images/search.png"
 				title="查看" style="width: 16px; height: 16px; vertical-align: middle;">
 		</button>
-		<button class="approve_buttons">
-			切换
-		</button>
-		<button class="reject_buttons">
-			回滚
-		</button>
 	</li>
 </ul>
 
@@ -547,8 +574,8 @@ $(document).ready(function() {
 	<div style="overflow: hidden;">
 		<div id="dialog_window_content" style="margin: 20px;">&nbsp;</div>
 		<div class="right margin_10">
-			<input type="button" id="dialog_window_ok_button" value="确定">
-			<input type="button" id="dialog_window_cancel_button" value="取消">
+			<input type="button" id="dialog_window_ok_button" value="切换当前版本">
+			<input type="button" id="dialog_window_cancel_button" value="回到上一版本">
 		</div>
 		<div class="clear"></div>
 	</div>
