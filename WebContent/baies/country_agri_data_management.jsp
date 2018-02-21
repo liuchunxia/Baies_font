@@ -19,67 +19,204 @@ String jqx_theme = (String)request.getSession().getAttribute("jqx_theme");
 
 page_id = 2;
 
+removeByValue = function(ary,val) {
+    var index = ary.indexOf(val);
+    if (index > -1) {
+        ary.splice(index, 1);
+    }
+};
+
+var parseParam=function(param){
+    var paramStr="";
+    for (var key in param) {
+        paramStr = paramStr+ "&"+ key + '=' + JSON.stringify(param[key])
+    }
+    return paramStr.substr(1);
+};
+
+var table_index_data= {};
+var table_data = [];
+var country_data = [];
+var index_data = [];
+var kind_data = [];
+var query_args = { country_ids:[], table_id:0, index_ids:[], start_time:'', end_time:'', kind_ids:[]};
+
+$.ajax({
+    type:'GET',
+    url:host+'/quantify/agriculture_table',
+    data: {},
+    withCredentials: true,
+    async: false ,
+    success: function (resp) {
+        for (var table in resp.data) {
+            console.log('table', resp.data[table])
+            table_data.push({label: resp.data[table].<fmt:message key="data.field" />, value: resp.data[table].id, id:resp.data[table].id})
+            table_index_data[resp.data[table].id] = resp.data[table].indexes
+        }
+        console.log('table', table_data, 'index', table_index_data)
+        // $('#cat_tree').jqxTree('render')
+        // $('#variable_list').jqxListBox('render')
+    }.bind(this)
+})
+
+
+$.ajax({
+    type:'GET',
+    url:host+'/quantify/country',
+    data: {},
+    withCredentials: true,
+    success: function (resp) {
+        for (var index in resp.data) {
+            country_data.push(resp.data[index])
+        }
+        $('#location_list').jqxListBox('refresh')
+
+        console.log(country_data,'r2')}.bind(this)
+});
+
+$.ajax({
+    type:'GET',
+    url:host+'/quantify/agriculture_kinds',
+    data: {},
+    withCredentials: true,
+    success: function (resp) {
+        for (var index in resp.data) {
+            kind_data.push(resp.data[index])
+        }
+        $('#product_list').jqxListBox('refresh')
+
+        console.log(kind_data,'kind')}.bind(this)
+});
+
+
 $(document).ready(function() {
-	
-	var cat_tree_src = agri_data_cat_tree_src_<fmt:message key="common.language" />;
-	
-	$('#cat_expander').jqxExpander({
-		width: '250px', height: '400px', showArrow: false, toggleMode: 'none', theme: '<%=jqx_theme %>'
-	});
-	
-	$('#cat_tree').jqxTree({
-		source: cat_tree_src, width: '100%', height: '100%', theme: '<%=jqx_theme %>'
-	});
-	
-	$('#location_expander').jqxExpander({
-		width: '280px', height: '180px', showArrow: false, toggleMode: 'none', theme: '<%=jqx_theme %>'
-	});
-	
-	$('#location_list').jqxListBox({
-		source: ['<fmt:message key="common.country.brazil" />', '<fmt:message key="common.country.russia" />', '<fmt:message key="common.country.india" />', '<fmt:message key="common.country.china" />', '<fmt:message key="common.country.south_africa" />', '<fmt:message key="common.country.brics" />', '<fmt:message key="common.country.world" />'], checkboxes: true,
-		multiple: true, width: '100%', height: '100%', theme: '<%=jqx_theme %>'
-	});
-	
-	$('#product_expander').jqxExpander({
-		width: '280px', height: '180px', showArrow: false, toggleMode: 'none', theme: '<%=jqx_theme %>'
-	});
-	
-	$('#product_list').jqxListBox({
-		source: ['<fmt:message key="common.product.rice" />', '<fmt:message key="common.product.wheat" />', '<fmt:message key="common.product.maize" />'], checkboxes: true,
-		multiple: true, width: '100%', height: '100%', theme: '<%=jqx_theme %>'
-	});
-	
-	$('#variable_expander').jqxExpander({
-		width: '280px', height: '180px', showArrow: false, toggleMode: 'none', theme: '<%=jqx_theme %>'
-	});
-	
-	$('#variable_list').jqxListBox({
-		source: ['<fmt:message key="common.indicator.harvest_area" />', '<fmt:message key="common.indicator.total_production" />', '<fmt:message key="common.indicator.yield" />'], checkboxes: true,
-		multiple: true, width: '100%', height: '100%', theme: '<%=jqx_theme %>'
-	});
-	
-	$('#time_expander').jqxExpander({
-		width: '280px', height: '100px', showArrow: false, toggleMode: 'none', theme: '<%=jqx_theme %>'
-	});
-	
-	$('#time_slider').jqxSlider({
-		width: '95%', values: [2005, 2010], min: 2000, max: 2016, mode: 'fixed',
-		rangeSlider: true, theme: '<%=jqx_theme %>', ticksFrequency: 1
-	});
-	
-	$('#time_slider').on('change', function(event) {
-		$('#time1').html(event.args.value.rangeStart);
-		$('#time2').html(event.args.value.rangeEnd);
-	});
-	
-	$('#query_button').jqxButton({
-		width: '150px', height: '40px', template: 'primary', theme: '<%=jqx_theme %>'
-	});
-	
-	$('#query_button').on('click', function() {
-		window.location.href='country_agri_data_management_table.jsp';
-	});
-	
+
+    var cat_tree_src = agri_data_cat_tree_src_<fmt:message key="common.language" />;
+
+    $('#cat_expander').jqxExpander({
+        width: '250px', height: '400px', showArrow: false, toggleMode: 'none', theme: '<%=jqx_theme %>'
+    });
+
+    $('#cat_tree').jqxTree({
+        source: table_data, width: '100%', height: '100%', theme: '<%=jqx_theme %>'
+    });
+
+    $('#location_expander').jqxExpander({
+        width: '280px', height: '180px', showArrow: false, toggleMode: 'none', theme: '<%=jqx_theme %>'
+    });
+
+    $('#location_list').jqxListBox({
+        source: country_data, checkboxes: true,
+        multiple: true, width: '100%', height: '100%', theme: '<%=jqx_theme %>',
+        displayMember:'<fmt:message key="data.field" />',valueMember:'id'
+    });
+
+    $('#product_expander').jqxExpander({
+        width: '280px', height: '180px', showArrow: false, toggleMode: 'none', theme: '<%=jqx_theme %>'
+    });
+
+    $('#product_list').jqxListBox({
+        source: kind_data, checkboxes: true,
+        multiple: true, width: '100%', height: '100%', theme: '<%=jqx_theme %>',
+        displayMember:'<fmt:message key="data.field" />',valueMember:'id'
+    });
+
+    $('#variable_expander').jqxExpander({
+        width: '280px', height: '180px', showArrow: false, toggleMode: 'none', theme: '<%=jqx_theme %>'
+    });
+
+    $('#variable_list').jqxListBox({
+        source: index_data, checkboxes: true,
+        multiple: true, width: '100%', height: '100%', theme: '<%=jqx_theme %>',
+        displayMember:'<fmt:message key="data.field" />',valueMember:'id'
+    });
+
+    $('#time_expander').jqxExpander({
+        width: '280px', height: '100px', showArrow: false, toggleMode: 'none', theme: '<%=jqx_theme %>'
+    });
+
+    $('#time_slider').jqxSlider({
+        width: '95%', values: [2015,2018 ], min: start_year, max: end_year, mode: 'fixed',
+        rangeSlider: true, theme: '<%=jqx_theme %>', ticksFrequency: 1
+    });
+
+    $('#time_slider').on('change', function(event) {
+        $('#time1').html(event.args.value.rangeStart);
+        $('#time2').html(event.args.value.rangeEnd);
+    });
+
+    $('#query_button').jqxButton({
+        width: '150px', height: '40px', template: 'primary', theme: '<%=jqx_theme %>'
+    });
+
+    $('#query_button').on('click', function() {
+        window.location.href='country_agri_data_management_table.jsp'+'?'+ parseParam(query_args);
+    });
+
+    // 处理事件
+    $('#cat_tree').on('select',function (event)
+    {
+        var args = event.args;
+        var item = $('#cat_tree').jqxTree('getItem', args.element);
+
+        query_args.table_id=item.value
+        index_data.splice(0,index_data.length);
+        query_args.index_ids=[]
+        for (var i in table_index_data[item.id]) {
+            index_data.push({label:table_index_data[item.id][i].<fmt:message key="data.field" />, value:table_index_data[item.id][i].id, id:table_index_data[item.id][i].id})
+        }
+        $('#variable_list').jqxListBox('refresh')
+        console.log('qu', query_args)
+        console.log("change", index_data)
+    });
+
+    $('#variable_list').on('select', function (event) {
+        var args = event.args;
+        console.log(args)
+        var item = $('#variable_list').jqxListBox('getItem', args.index);
+        if (item.checked === true) {
+            query_args.index_ids.push(item.value)
+        }
+        else {
+            removeByValue(query_args.index_ids,item.value)
+        }
+        console.log('qu', query_args)
+    })
+
+    $('#location_list').on('select', function (event) {
+        var args = event.args;
+        var item = $('#location_list').jqxListBox('getItem', args.index);
+        if (item.checked === true) {
+            query_args.country_ids.push(item.value)
+        }
+        else {
+            removeByValue(query_args.country_ids,item.value)
+        }
+        console.log('qu', query_args)
+    })
+
+    $('#product_list').on('select', function (event) {
+        var args = event.args;
+        var item = $('#product_list').jqxListBox('getItem', args.index);
+        if (item.checked === true) {
+            query_args.kind_ids.push(item.value)
+        }
+        else {
+            removeByValue(query_args.kind_ids,item.value)
+        }
+        console.log('qu', query_args)
+    })
+
+    var values = $('#time_slider').jqxSlider('values');
+    query_args.start_time = values[0];
+    query_args.end_time = values[1];
+
+    $('#time_slider').on('change', function (event) {
+        var values = $('#time_slider').jqxSlider('values');
+        query_args.start_time = values[0]
+        query_args.end_time = values[1]
+        console.log('qu', query_args)
+    });
 });
 
 </script>
