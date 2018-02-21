@@ -136,7 +136,7 @@ $(document).ready(function() {
     });
 
     $('#time_slider').jqxSlider({
-        width: '95%', values: [2015,2018 ], min: start_year, max: end_year, mode: 'fixed',
+        width: '95%', values: [2015,2016 ], min: start_year, max: end_year, mode: 'fixed',
         rangeSlider: true, theme: '<%=jqx_theme %>', ticksFrequency: 1
     });
 
