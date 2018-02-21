@@ -199,7 +199,7 @@ $(document).ready(function() {
 	// $("#variable_list").jqxDropDownList('checkIndex', 1);
 
     $('#time_slider').jqxSlider({
-        width: '220px', values: [2005, 2010], min: 2000, max:myDate.getFullYear(), mode: 'fixed',
+        width: '220px', values: [2005, 2010], min: start_year, max:end_year, mode: 'fixed',
         rangeSlider: true, theme: '<%=jqx_theme %>', ticksFrequency: 1
     });
 	
@@ -283,6 +283,23 @@ $(document).ready(function() {
         }
         console.log('qu', query_args)
     })
+
+    $('#product_list').on('select', function (event) {
+        var args = event.args;
+        var item = $('#product_list').jqxDropDownList('getItem', args.index);
+        console.log("国家选择开始s",item)
+
+        if (item.checked === true) {
+            query_args.kind_ids.push(item.value)
+            console.log("国家选择")
+        }
+        else {
+            console.log("国家取消")
+            removeByValue(query_args.kind_ids,item.value)
+        }
+        console.log('qu', query_args)
+    })
+
 
     $('#time_slider').on('change', function (event) {
         var values = $('#time_slider').jqxSlider('values');

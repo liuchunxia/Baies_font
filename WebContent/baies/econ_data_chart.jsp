@@ -19,7 +19,6 @@ String jqx_theme = (String)request.getSession().getAttribute("jqx_theme");
 
 page_id = 2;
 
-var myDate = new Date();
 
 removeByValue = function(ary,val) {
     var index = ary.indexOf(val);
@@ -125,7 +124,7 @@ $(document).ready(function() {
     $('#location_list').jqxDropDownList({
         source: country_data, checkboxes: true,
         width: '100%', theme: '<%=jqx_theme %>',
-        displayMember:"name",valueMember:"id"
+        displayMember:'<fmt:message key="data.field" />',valueMember:"id"
     });
 	
 	// $("#location_list").jqxDropDownList('checkIndex', 0);
@@ -141,13 +140,13 @@ $(document).ready(function() {
     $('#variable_list').jqxDropDownList({
         source: index_data, checkboxes: true,
         width: '100%', theme: '<%=jqx_theme %>',
-        displayMember:"name",valueMember:"id"
+        displayMember:'<fmt:message key="data.field" />',valueMember:"id"
     });
 	
 	// $("#variable_list").jqxDropDownList('checkIndex', 0);
 	//
 	$('#time_slider').jqxSlider({
-		width: '220px', values: [2005, 2010], min: 2000, max: myDate.getFullYear(), mode: 'fixed',
+		width: '220px', values: [2005, 2010], min: start_year, max:end_year, mode: 'fixed',
 		rangeSlider: true, theme: '<%=jqx_theme %>', ticksFrequency: 1
 	});
 	
