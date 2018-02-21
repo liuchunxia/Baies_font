@@ -25,7 +25,7 @@ var index_data = [];
 
 $.ajax({
     type:'GET',
-    url:'http://127.0.0.1:5000/quantify/socioeconomic_table',
+    url:host+'/quantify/socioeconomic_table',
     data: {},
     withCredentials: true,
     async: false,
@@ -127,7 +127,7 @@ $(document).ready(function() {
 				console.log('post', post_data)
                 $.ajax({
                     type:'POST',
-                    url:'http://127.0.0.1:5000/quantify/socioeconomic_table',
+                    url:host+'/quantify/socioeconomic_table',
                     data: post_data,
                     withCredentials: true,
                     async: false,
@@ -159,7 +159,7 @@ $(document).ready(function() {
                 console.log('post', post_data)
                 $.ajax({
                     type:'PUT',
-                    url:'http://127.0.0.1:5000/quantify/socioeconomic_table',
+                    url:host+'/quantify/socioeconomic_table',
                     data: post_data,
                     withCredentials: true,
                     async: false,
@@ -184,7 +184,7 @@ $(document).ready(function() {
                 console.log('post', post_data)
                 $.ajax({
                     type:'DELETE',
-                    url:'http://127.0.0.1:5000/quantify/socioeconomic_table',
+                    url:host+'/quantify/socioeconomic_table',
                     data: post_data,
                     withCredentials: true,
                     async: false,
@@ -217,7 +217,7 @@ $(document).ready(function() {
             post_data.table_id = $('#cat_tree').jqxTree('getSelectedItem').value
             $.ajax({
                 type:'POST',
-                url:'http://127.0.0.1:5000/quantify/socioeconomic_index',
+                url:host+'/quantify/socioeconomic_index',
                 data: post_data,
                 withCredentials: true,
                 async: false,
@@ -251,7 +251,7 @@ $(document).ready(function() {
             if(event.args.dialogResult.OK) {
 			$.ajax({
                 type:'PUT',
-                url:'http://127.0.0.1:5000/quantify/socioeconomic_index',
+                url:host+'/quantify/socioeconomic_index',
                 data: post_data,
                 withCredentials: true,
                 async: false,
@@ -278,7 +278,7 @@ $(document).ready(function() {
                 console.log('post', post_data)
                 $.ajax({
                     type:'DELETE',
-                    url:'http://127.0.0.1:5000/quantify/socioeconomic_index',
+                    url:host+'/quantify/socioeconomic_index',
                     data: post_data,
                     withCredentials: true,
                     async: false,

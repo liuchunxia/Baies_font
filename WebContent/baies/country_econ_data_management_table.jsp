@@ -101,7 +101,7 @@ $(document).ready(function() {
 
     $.ajax({
         type:'GET',
-        url:'http://127.0.0.1:5000/quantify/socioeconomic_table',
+        url:host+'/quantify/socioeconomic_table',
         data: {},
         withCredentials: true,
         async: false,
@@ -120,7 +120,7 @@ $(document).ready(function() {
 
     $.ajax({
         type:'GET',
-        url:'http://127.0.0.1:5000/quantify/country',
+        url:host+'/quantify/country',
         data: {},
         withCredentials: true,
         async: false,
@@ -224,7 +224,7 @@ $(document).ready(function() {
                     async: true,
                     crossDomain: true,
                     processData: false,
-                    url: "http://127.0.0.1:5000/quantify/socioeconomic_facts/batch",
+                    url: host+"/quantify/socioeconomic_facts/batch",
                     method: "POST",
                     data: JSON.stringify(post_data),
                     headers: {
@@ -409,7 +409,7 @@ $(document).ready(function() {
         console.log(data_fields,data_columns)
         $.ajax({
             type:'GET',
-            url:'http://127.0.0.1:5000/quantify/socioeconomic_facts'+location.search,
+            url:host+'/quantify/socioeconomic_facts'+location.search,
             data: {},
             withCredentials: true,
             async: true,

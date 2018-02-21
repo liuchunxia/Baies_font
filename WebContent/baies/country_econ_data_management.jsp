@@ -43,7 +43,7 @@ String jqx_theme = (String)request.getSession().getAttribute("jqx_theme");
 
     $.ajax({
         type:'GET',
-        url:'http://127.0.0.1:5000/quantify/socioeconomic_table',
+        url:host+'/quantify/socioeconomic_table',
         data: {},
         withCredentials: true,
         async: false,
@@ -62,7 +62,7 @@ String jqx_theme = (String)request.getSession().getAttribute("jqx_theme");
 
     $.ajax({
         type:'GET',
-        url:'http://127.0.0.1:5000/quantify/country',
+        url:host+'/quantify/country',
         data: {},
         withCredentials: true,
         success: function (resp) {

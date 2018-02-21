@@ -110,7 +110,7 @@ $(document).ready(function() {
 
     $.ajax({
         type:'GET',
-        url:'http://127.0.0.1:5000/quantify/country',
+        url:host+'/quantify/country',
         data: {},
         withCredentials: true,
         async: true,
@@ -124,7 +124,7 @@ $(document).ready(function() {
     getAllLog = function () {
         $.ajax({
             type:'GET',
-            url:'http://127.0.0.1:5000/user/SocLog',
+            url:host+'/user/SocLog',
             data:{},
             withCredentials: true,
             async: true,
@@ -322,7 +322,7 @@ $(document).ready(function() {
                         async: true,
                         crossDomain: true,
                         withCredentials: true,
-                        url: "http://127.0.0.1:5000/quantify/socioeconomic_table",
+                        url: host+"/quantify/socioeconomic_table",
                         method: "PUT",
                         data: post_data,
                         success: function (resp) {
@@ -344,7 +344,7 @@ $(document).ready(function() {
                         async: true,
                         crossDomain: true,
                         withCredentials: true,
-                        url: "http://127.0.0.1:5000/quantify/socioeconomic_table",
+                        url: host+"/quantify/socioeconomic_table",
                         method: "PUT",
                         data: post_data,
                         success: function (resp) {
@@ -368,7 +368,7 @@ $(document).ready(function() {
                 async: true,
                 crossDomain: true,
                 withCredentials: true,
-                url: "http://127.0.0.1:5000/quantify/socioeconomic_table/"+log.table_id+"/indexes",
+                url: host+"/quantify/socioeconomic_table/"+log.table_id+"/indexes",
                 method: "GET",
                 data: {},
                 success: function (resp) {
@@ -390,7 +390,7 @@ $(document).ready(function() {
 
                     $.ajax({
                         type:'GET',
-                        url:'http://127.0.0.1:5000/quantify/socioeconomic_facts'+'?'+ parseParam(query_args),
+                        url:host+'/quantify/socioeconomic_facts'+'?'+ parseParam(query_args),
                         data: {},
                         withCredentials: true,
                         async: true,
@@ -458,7 +458,7 @@ $(document).ready(function() {
 
                     $.ajax({
                         type:'GET',
-                        url:'http://127.0.0.1:5000/quantify/socioeconomic_facts'+'?'+ parseParam(query_args),
+                        url:host+'/quantify/socioeconomic_facts'+'?'+ parseParam(query_args),
                         data: {},
                         withCredentials: true,
                         async: true,

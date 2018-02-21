@@ -111,7 +111,7 @@ $(document).ready(function() {
             data.length = 0;
             $.ajax({
                 type:'GET',
-                url:'http://127.0.0.1:5000/qualitative/Post',
+                url:host+'/qualitative/Post',
                 data: {kind_id:selete_cat[3]},
                 withCredentials: true,
                 async: true,
