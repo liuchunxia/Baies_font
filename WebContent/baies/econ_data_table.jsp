@@ -118,12 +118,16 @@ $(document).ready(function() {
         url:host+'/quantify/country',
         data: {},
         withCredentials: true,
-        async: false,
+        async: true,
         success: function (resp) {
             for (var index in resp.data) {
                 country_data.push(resp.data[index])
             }
-            console.log(country_data,'r2')}.bind(this)
+            console.log(country_data,'r2')
+            $('#location_list').jqxDropDownList('render')
+            $('#location_list').jqxDropDownList('refresh')
+        }.bind(this)
+
     });
 
 
