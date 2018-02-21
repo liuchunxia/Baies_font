@@ -25,14 +25,14 @@ var index_data = [];
 
 $.ajax({
     type:'GET',
-    url:'http://127.0.0.1:5000/quantify/socioeconomic_table',
+    url:host+'/quantify/socioeconomic_table',
     data: {},
     withCredentials: true,
     async: false,
     success: function (resp) {
         for (var table in resp.data) {
             console.log('table', resp.data[table])
-            table_data.push({label: resp.data[table].name, value: resp.data[table].id, id:resp.data[table].id})
+            table_data.push({label: resp.data[table].<fmt:message key="data.field" />, value: resp.data[table].id, id:resp.data[table].id})
             table_index_data[resp.data[table].id] = resp.data[table].indexes
         }
         console.log('table', table_data, 'index', table_index_data)
@@ -127,7 +127,7 @@ $(document).ready(function() {
 				console.log('post', post_data)
                 $.ajax({
                     type:'POST',
-                    url:'http://127.0.0.1:5000/quantify/socioeconomic_table',
+                    url:host+'/quantify/socioeconomic_table',
                     data: post_data,
                     withCredentials: true,
                     async: false,
@@ -159,7 +159,7 @@ $(document).ready(function() {
                 console.log('post', post_data)
                 $.ajax({
                     type:'PUT',
-                    url:'http://127.0.0.1:5000/quantify/socioeconomic_table',
+                    url:host+'/quantify/socioeconomic_table',
                     data: post_data,
                     withCredentials: true,
                     async: false,
@@ -184,7 +184,7 @@ $(document).ready(function() {
                 console.log('post', post_data)
                 $.ajax({
                     type:'DELETE',
-                    url:'http://127.0.0.1:5000/quantify/socioeconomic_table',
+                    url:host+'/quantify/socioeconomic_table',
                     data: post_data,
                     withCredentials: true,
                     async: false,
@@ -217,7 +217,7 @@ $(document).ready(function() {
             post_data.table_id = $('#cat_tree').jqxTree('getSelectedItem').value
             $.ajax({
                 type:'POST',
-                url:'http://127.0.0.1:5000/quantify/socioeconomic_index',
+                url:host+'/quantify/socioeconomic_index',
                 data: post_data,
                 withCredentials: true,
                 async: false,
@@ -251,7 +251,7 @@ $(document).ready(function() {
             if(event.args.dialogResult.OK) {
 			$.ajax({
                 type:'PUT',
-                url:'http://127.0.0.1:5000/quantify/socioeconomic_index',
+                url:host+'/quantify/socioeconomic_index',
                 data: post_data,
                 withCredentials: true,
                 async: false,
@@ -278,7 +278,7 @@ $(document).ready(function() {
                 console.log('post', post_data)
                 $.ajax({
                     type:'DELETE',
-                    url:'http://127.0.0.1:5000/quantify/socioeconomic_index',
+                    url:host+'/quantify/socioeconomic_index',
                     data: post_data,
                     withCredentials: true,
                     async: false,
@@ -302,7 +302,7 @@ $(document).ready(function() {
 
         index_data.splice(0,index_data.length);
         for (var i in table_index_data[item.id]) {
-            index_data.push({label:table_index_data[item.id][i].name, value:table_index_data[item.id][i].id, id:table_index_data[item.id][i].id})
+            index_data.push({label:table_index_data[item.id][i].<fmt:message key="data.field" />, value:table_index_data[item.id][i].id, id:table_index_data[item.id][i].id})
         }
         $('#variable_list').jqxListBox('refresh')
         console.log("change", index_data)

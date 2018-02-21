@@ -101,14 +101,14 @@ $(document).ready(function() {
 
     $.ajax({
         type:'GET',
-        url:'http://127.0.0.1:5000/quantify/socioeconomic_table',
+        url:host+'/quantify/socioeconomic_table',
         data: {},
         withCredentials: true,
         async: false,
         success: function (resp) {
             for (var table in resp.data) {
                 console.log('table', resp.data[table])
-                table_data.push({label: resp.data[table].name, value: resp.data[table].id, id:resp.data[table].id})
+                table_data.push({label: resp.data[table].<fmt:message key="data.field" />, value: resp.data[table].id, id:resp.data[table].id})
                 table_index_data[resp.data[table].id] = resp.data[table].indexes
             }
             console.log('table', table_data, 'index', table_index_data)
@@ -120,7 +120,7 @@ $(document).ready(function() {
 
     $.ajax({
         type:'GET',
-        url:'http://127.0.0.1:5000/quantify/country',
+        url:host+'/quantify/country',
         data: {},
         withCredentials: true,
         async: false,
@@ -152,7 +152,7 @@ $(document).ready(function() {
     $('#location_list').jqxDropDownList({
         source: country_data, checkboxes: true,
         width: '100%', theme: '<%=jqx_theme %>',
-        displayMember:"name",valueMember:"id"
+        displayMember:'<fmt:message key="data.field" />',valueMember:"id"
     });
 	
 	$("#location_list").jqxDropDownList('checkIndex', 0);
@@ -170,7 +170,7 @@ $(document).ready(function() {
     $('#variable_list').jqxDropDownList({
         source: index_data, checkboxes: true,
         width: '100%', theme: '<%=jqx_theme %>',
-        displayMember:"name",valueMember:"id"
+        displayMember:'<fmt:message key="data.field" />',valueMember:"id"
     });
 	
 	$("#variable_list").jqxDropDownList('checkIndex', 0);
@@ -224,7 +224,7 @@ $(document).ready(function() {
                     async: true,
                     crossDomain: true,
                     processData: false,
-                    url: "http://127.0.0.1:5000/quantify/socioeconomic_facts/batch",
+                    url: host+"/quantify/socioeconomic_facts/batch",
                     method: "POST",
                     data: JSON.stringify(post_data),
                     headers: {
@@ -409,7 +409,7 @@ $(document).ready(function() {
         console.log(data_fields,data_columns)
         $.ajax({
             type:'GET',
-            url:'http://127.0.0.1:5000/quantify/socioeconomic_facts'+location.search,
+            url:host+'/quantify/socioeconomic_facts'+location.search,
             data: {},
             withCredentials: true,
             async: true,
@@ -442,7 +442,7 @@ $(document).ready(function() {
                                     }
                                     return false
                                 }
-                            ).name,
+                            ).<fmt:message key="data.field" />,
                             variable: findArrayByValue(index_data,
                                 index_id,
                                 function (x,y) {
@@ -451,7 +451,7 @@ $(document).ready(function() {
                                     }
                                     return false
                                 }
-                            ).name,
+                            ).<fmt:message key="data.field" />,
                             country_id: country_id,
                             index_id: index_id}
 

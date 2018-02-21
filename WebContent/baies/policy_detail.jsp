@@ -28,7 +28,7 @@ String jqx_theme = (String)request.getSession().getAttribute("jqx_theme");
        $.ajax({
            type: "get",
            async: false,
-           url: "http://127.0.0.1:5000/qualitative/Post/"+id,
+           url: host+"/qualitative/Post/"+id,
            data: {},
            success: function (result) {
                var data = result.data

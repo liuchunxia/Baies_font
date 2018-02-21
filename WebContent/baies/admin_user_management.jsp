@@ -42,7 +42,7 @@ $(document).ready(function() {
 
     $.ajax({
         type:'GET',
-        url:'http://127.0.0.1:5000/user/User',
+        url:host+'/user/User',
         data: {},
         withCredentials: true,
 		async: false,
@@ -62,7 +62,7 @@ $(document).ready(function() {
     });
     $.ajax({
         type:'GET',
-        url:'http://127.0.0.1:5000/user/Role',
+        url:host+'/user/Role',
         data: {},
         async: false,
         withCredentials: true,
@@ -135,7 +135,7 @@ $(document).ready(function() {
 
                         $.ajax({
                             type:'POST',
-                            url:'http://127.0.0.1:5000/user/User',
+                            url:host+'/user/User',
                             data: post_data,
                             async: true,
                             withCredentials: true,
@@ -201,7 +201,7 @@ $(document).ready(function() {
 
                 $.ajax({
                     type:'PUT',
-                    url:'http://127.0.0.1:5000/user/User/'+user.id,
+                    url:host+'/user/User/'+user.id,
                     data: post_data,
                     async: true,
                     withCredentials: true,
@@ -224,7 +224,7 @@ $(document).ready(function() {
 				console.log("delete use ok", user)
                 $.ajax({
                     type:'DELETE',
-                    url:'http://127.0.0.1:5000/user/User/'+user.id,
+                    url:host+'/user/User/'+user.id,
                     data: {},
                     async: true,
                     withCredentials: true,

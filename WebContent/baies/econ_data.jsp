@@ -44,31 +44,30 @@ var query_args = { country_ids:[], table_id:0, index_ids:[], start_time:'', end_
 
 $.ajax({
     type:'GET',
-    url:'http://127.0.0.1:5000/quantify/socioeconomic_table',
+    url:host+'/quantify/socioeconomic_table',
     data: {},
     withCredentials: true,
-    async: false,
+    async: false ,
     success: function (resp) {
         for (var table in resp.data) {
             console.log('table', resp.data[table])
-            table_data.push({label: resp.data[table].name, value: resp.data[table].id, id:resp.data[table].id})
+            table_data.push({label: resp.data[table].<fmt:message key="data.field" />, value: resp.data[table].id, id:resp.data[table].id})
             table_index_data[resp.data[table].id] = resp.data[table].indexes
         }
         console.log('table', table_data, 'index', table_index_data)
-        // $('#cat_tree').jqxTree('refresh')
+        // $('#cat_tree').jqxTree('render')
         // $('#variable_list').jqxListBox('render')
-		// $('#cat_expander').jqxExpander('refresh')
 		}.bind(this)
 	})
 
 $.ajax({
     type:'GET',
-    url:'http://127.0.0.1:5000/quantify/country',
+    url:host+'/quantify/country',
     data: {},
     withCredentials: true,
     success: function (resp) {
         for (var index in resp.data) {
-            country_data.push({label:resp.data[index].name, value:resp.data[index].id, id: resp.data[index].name})
+            country_data.push({label:resp.data[index].<fmt:message key="data.field" />, value:resp.data[index].id, id: resp.data[index].id})
         }
         $('#location_list').jqxListBox('refresh')
 
@@ -139,7 +138,7 @@ $(document).ready(function() {
         index_data.splice(0,index_data.length);
         query_args.index_ids=[]
        	for (var i in table_index_data[item.id]) {
-       	    index_data.push({label:table_index_data[item.id][i].name, value:table_index_data[item.id][i].id, id:table_index_data[item.id][i].id})
+       	    index_data.push({label:table_index_data[item.id][i].<fmt:message key="data.field" />, value:table_index_data[item.id][i].id, id:table_index_data[item.id][i].id})
 		}
         $('#variable_list').jqxListBox('refresh')
         console.log('qu', query_args)

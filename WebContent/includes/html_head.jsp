@@ -44,3 +44,4 @@
 <script type="text/javascript" src="../js/jqwidgets-4.1.2/jqx-all.js"></script>
 
 <script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript" src="../js/public_tool.js"></script>

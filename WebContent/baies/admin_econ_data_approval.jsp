@@ -110,7 +110,7 @@ $(document).ready(function() {
 
     $.ajax({
         type:'GET',
-        url:'http://127.0.0.1:5000/quantify/country',
+        url:host+'/quantify/country',
         data: {},
         withCredentials: true,
         async: true,
@@ -124,7 +124,7 @@ $(document).ready(function() {
     getAllLog = function () {
         $.ajax({
             type:'GET',
-            url:'http://127.0.0.1:5000/user/SocLog',
+            url:host+'/user/SocLog',
             data:{},
             withCredentials: true,
             async: true,
@@ -308,24 +308,23 @@ $(document).ready(function() {
         $('.detail_buttons').on('click', function() {
             $('#diff_category').html(log.table_name);
 
-            $('#dialog_window').one('close', function(event) {
+
+            $('#diff_window').one('close', function(event) {
                 if(event.args.dialogResult.OK) {
 
                     var post_data = {
-                        
-					}
+						id: log.table_id,
+                        cur_log_id: log.id
+					};
+                    console.log("切换")
 
                     $.ajax({
                         async: true,
                         crossDomain: true,
-                        processData: false,
-                        url: "http://127.0.0.1:5000/quantify/socioeconomic_table",
+                        withCredentials: true,
+                        url: host+"/quantify/socioeconomic_table",
                         method: "PUT",
-                        data: JSON.stringify(post_data),
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Cache-Control": "no-cache"
-                        },
+                        data: post_data,
                         success: function (resp) {
                             console.log(resp);
                             $('#message_notification_content').html('修订版本已保存。');
@@ -334,8 +333,27 @@ $(document).ready(function() {
                         }
                     })
                 }
-                else {
+                else if(event.args.dialogResult.Cancel){
+                    var post_data = {
+                        id: log.table_id,
+                        cur_log_id: log.pre_log_id
+                    };
+                    console.log("回滚")
 
+                    $.ajax({
+                        async: true,
+                        crossDomain: true,
+                        withCredentials: true,
+                        url: host+"/quantify/socioeconomic_table",
+                        method: "PUT",
+                        data: post_data,
+                        success: function (resp) {
+                            console.log(resp);
+                            $('#message_notification_content').html('修订版本已保存。');
+                            $('#message_notification').jqxNotification('open');
+                            window.location.reload();
+                        }
+                    })
 				}
             });
 
@@ -349,7 +367,8 @@ $(document).ready(function() {
             $.ajax({
                 async: true,
                 crossDomain: true,
-                url: "http://127.0.0.1:5000/quantify/socioeconomic_table/"+log.table_id+"/indexes",
+                withCredentials: true,
+                url: host+"/quantify/socioeconomic_table/"+log.table_id+"/indexes",
                 method: "GET",
                 data: {},
                 success: function (resp) {
@@ -371,7 +390,7 @@ $(document).ready(function() {
 
                     $.ajax({
                         type:'GET',
-                        url:'http://127.0.0.1:5000/quantify/socioeconomic_facts'+'?'+ parseParam(query_args),
+                        url:host+'/quantify/socioeconomic_facts'+'?'+ parseParam(query_args),
                         data: {},
                         withCredentials: true,
                         async: true,
@@ -404,7 +423,7 @@ $(document).ready(function() {
                                                 }
                                                 return false
                                             }
-                                        ).name,
+                                        ).<fmt:message key="data.field" />,
                                         variable: findArrayByValue(cur_indexes,
                                             index_id,
                                             function (x,y) {
@@ -413,7 +432,7 @@ $(document).ready(function() {
                                                 }
                                                 return false
                                             }
-                                        ).name,
+                                        ).<fmt:message key="data.field" />,
                                         country_id: country_id,
                                         index_id: index_id}
 
@@ -439,7 +458,7 @@ $(document).ready(function() {
 
                     $.ajax({
                         type:'GET',
-                        url:'http://127.0.0.1:5000/quantify/socioeconomic_facts'+'?'+ parseParam(query_args),
+                        url:host+'/quantify/socioeconomic_facts'+'?'+ parseParam(query_args),
                         data: {},
                         withCredentials: true,
                         async: true,
@@ -472,7 +491,7 @@ $(document).ready(function() {
                                                 }
                                                 return false
                                             }
-                                        ).name,
+                                        ).<fmt:message key="data.field" />,
                                         variable: findArrayByValue(cur_indexes,
                                             index_id,
                                             function (x,y) {
@@ -481,7 +500,7 @@ $(document).ready(function() {
                                                 }
                                                 return false
                                             }
-                                        ).name,
+                                        ).<fmt:message key="data.field" />,
                                         country_id: country_id,
                                         index_id: index_id}
 
@@ -602,8 +621,8 @@ $(document).ready(function() {
 			</div>
 		</div>
 		<div class="right margin_10">
-			<input type="button" id="diff_window_ok_button" value="通过">
-			<input type="button" id="diff_window_cancel_button" value="拒绝">
+			<input type="button" id="diff_window_ok_button" value="切换当前版本">
+			<input type="button" id="diff_window_cancel_button" value="回到上一版本">
 		</div>
 		<div class="clear"></div>
 	</div>
