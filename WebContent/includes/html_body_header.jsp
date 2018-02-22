@@ -25,7 +25,7 @@ String jqx_nav_theme = (String)request.getSession().getAttribute("jqx_nav_theme"
 	}
 	#system_manage{
 		display: none;
-	}
+	};
 </style>
 
 <script type="text/javascript">
@@ -53,10 +53,10 @@ String jqx_nav_theme = (String)request.getSession().getAttribute("jqx_nav_theme"
             if (current_user.role.name === "Anonymous")
             {
                 console.log("匿名登录")
-                $('#login').css("display","none")
+                $('#login').css("display","block")
                 $('#country_manage').css("display","none")
                 $('#system_manage').css("display","none")
-                // $('#logout').css("display","block")
+                $('#logout').css("display","none")
             }
             else if(current_user.role.name === "CountryQualitative" || current_user.role.name === "User"|| current_user.role.name === "CountryQuantify")
             {
@@ -64,7 +64,7 @@ String jqx_nav_theme = (String)request.getSession().getAttribute("jqx_nav_theme"
                 $('#login').css("display","none")
                 $('#country_manage').css("display","block")
                 $('#system_manage').css("display","none")
-                // $('#logout').css("display","block")
+                $('#logout').css("display","block")
             }
             else if(current_user.role.name === "Administrator")
             {
@@ -72,7 +72,7 @@ String jqx_nav_theme = (String)request.getSession().getAttribute("jqx_nav_theme"
                 $('#login').css("display","none")
                 $('#country_manage').css("display","block")
                 $('#system_manage').css("display","block")
-                // $('#logout').css("display","block")
+                $('#logout').css("display","block")
             }
         }
 
@@ -133,8 +133,8 @@ String jqx_nav_theme = (String)request.getSession().getAttribute("jqx_nav_theme"
 		<a href="" id="login">登录</a>
 		<span id="manage">
 			欢迎您<span id="curent_user_detail"></span>
-            <a href="./" id="logout">
-				<span><fmt:message key="text.logout" />
+            <a href="./">
+				<span id="logout"><fmt:message key="text.logout" />
 				</span></a>
 			&nbsp;&nbsp;|&nbsp;&nbsp;
 			<a id="country_manage" href="country_policy_management.jsp"><fmt:message key="common.sub_system.country_manage" /></a>
