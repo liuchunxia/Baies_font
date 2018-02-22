@@ -222,7 +222,7 @@ $(document).ready(function() {
 	});
 	
 	$('#chart_button').on('click', function() {
-		window.location.href='agri_data_chart.jsp'+parseParam(old_query_args);;
+		window.location.href='agri_data_chart.jsp'+'?'+parseParam(old_query_args);;
 	});
 	
 	$('#export_button').jqxButton({
