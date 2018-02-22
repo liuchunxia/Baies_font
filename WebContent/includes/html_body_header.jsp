@@ -56,7 +56,7 @@ String jqx_nav_theme = (String)request.getSession().getAttribute("jqx_nav_theme"
                 $('#login').css("display","none")
                 $('#country_manage').css("display","none")
                 $('#system_manage').css("display","none")
-                // $('#logout').css("display","none")
+                // $('#logout').css("display","block")
             }
             else if(current_user.role.name === "CountryQualitative" || current_user.role.name === "User"|| current_user.role.name === "CountryQuantify")
             {
@@ -151,9 +151,7 @@ String jqx_nav_theme = (String)request.getSession().getAttribute("jqx_nav_theme"
 		<a href="" id="login">登录</a>
 		<span id="manage">
 			欢迎您<span id="curent_user_detail"></span>
-            <a href="./">
-				<span id="logout"><fmt:message key="text.logout" />
-				</span></a>
+            <a href="./" id="logout"><fmt:message key="text.logout" /></a>
 			&nbsp;&nbsp;|&nbsp;&nbsp;
 			<a id="country_manage" href="country_policy_management.jsp"><fmt:message key="common.sub_system.country_manage" /></a>
 			&nbsp;
