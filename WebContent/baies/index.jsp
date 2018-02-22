@@ -172,15 +172,21 @@ $(document).ready(function() {
         url: host+"/qualitative/Post/simple",
         data: {},
         success: function (result) {
+            console.log(result)
             var data = result.data
+            console.log(data)
             data.forEach(function (value,index) {
-                if(value.kind_id == 1){
+				console.log(value.kind_id)
+				if(index <10){
+                    $(".news_expander").append('<div class="news_content">·<a href="policy_detail.jsp?id='+ value.id+'">'+value.title+'</a></div>')
+                }
+				if(value.kind_id == 1){
                     $(".policy_expander_1").append('<div class="news_content">· <a href="policy_detail.jsp?id='+ value.id+'">'+value.title+'</a></div>')
                 }else if(value.kind_id == 2){
                     $(".policy_expander_2").append('<div class="news_content">· <a href="policy_detail.jsp?id='+ value.id+'">'+value.title+'</a></div>')
                 }else if(value.kind_id == 3){
                     $(".policy_expander_3").append('<div class="news_content">·<a href="policy_detail.jsp?id='+ value.id+'">'+value.title+'</a></div>')
-                }else {
+                }else{
                     $(".policy_expander_4").append('<div class="news_content">·<a href="policy_detail.jsp?id='+ value.id+'">'+value.title+'</a></div>')
                 }
             })
@@ -217,13 +223,13 @@ $(document).ready(function() {
 	<div class="left margin_15"></div>
 	<div id="news_expander" class="left">
 		<div style="width: 98%;"><div class="left"><fmt:message key="index.latest_news" /></div><div class="right"><a href=""><fmt:message key="text.more" />&gt;</a></div></div>
-		<div style="overflow: hidden;">
+		<div style="overflow: hidden;" class="news_expander">
 			<div class="margin_30"></div>
-			<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title" /></a></div>
-			<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title" /></a></div>
-			<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title" /></a></div>
-			<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title" /></a></div>
-			<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title" /></a></div>
+			<%--<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title" /></a></div>--%>
+			<%--<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title" /></a></div>--%>
+			<%--<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title" /></a></div>--%>
+			<%--<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title" /></a></div>--%>
+			<%--<div class="news_content">· <a href="#"><fmt:message key="temp.policy_title" /></a></div>--%>
 		</div>
 	</div>
 	<div class="clear"></div>
