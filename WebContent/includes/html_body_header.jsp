@@ -13,27 +13,39 @@ String jqx_nav_theme = (String)request.getSession().getAttribute("jqx_nav_theme"
 %>
 
 <style>
-	.submit{
-		text-align: center;
-	}
 	#submit {
 		margin-top: 10px;
+		text-align: center;
 	}
 	#userName{
 		margin-bottom: 10px;
 	}
-	#manage, #jqxwindow{
+	#manage{
 		display: none;
 	}
 </style>
 
 <script type="text/javascript">
     $(document).ready(function () {
-        $("#jqxwindow ").jqxWindow({ height:150, width: 200, theme: 'summer'});
+        $("#jqxwindow").jqxWindow({ height:150, width: 200, theme: 'summer',isModal: true,autoOpen: false});
+
         $("#login").click(function () {
-            alert('aaa')
-            $("#jqxwindow ").css("display","block");
-            $("#jqxwindow ").jqxWindow( {isModal: true})
+			 var opened = $("#jqxwindow").jqxWindow('isOpen');
+            if (opened == false){
+                $("#jqxwindow").jqxWindow('open');
+                return false;
+			}
+        })
+
+        $("#submit").click(function () {
+            var name= $("#userName").val();
+			if(name == ''){
+                alert("请填写账号")
+			}
+			var password = $("#password").val();
+            if(password == ''){
+                alert("请填写密码")
+            }
             $.ajax({
                 //几个参数需要注意一下
                 type: "POST",//方法类型
@@ -160,7 +172,7 @@ $(document).ready(function() {
             <form id="loginForm" onsubmit="return false" action="##" method="post">
                 <div>用户名：<input name="userName" type="text" id="userName" size="15" value=""/></div>
                 <div>密　码：<input name="password" type="password" id="password" size="15" value=""/></div>
-                <div class="submit" onclick="login()"><input type="button" value="登录"></div>
+                <div id="submit" onclick="submit()"><input type="button" value="登录"></div>
             </form>
 			<%--<form id="loginForm" method="post">--%>
 				<%--<div>--%>
