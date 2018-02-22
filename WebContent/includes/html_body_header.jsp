@@ -12,6 +12,41 @@ String jqx_theme = (String)request.getSession().getAttribute("jqx_theme");
 String jqx_nav_theme = (String)request.getSession().getAttribute("jqx_nav_theme");
 %>
 
+<style>
+	.submit{
+		text-align: center;
+	}
+	#submit {
+		margin-top: 10px;
+	}
+	#userName{
+		margin-bottom: 10px;
+	}
+	#manage, #jqxwindow{
+		display: none;
+	}
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#jqxwindow ").jqxWindow({ height:150, width: 200, theme: 'summer'});
+        $("#login").click(function () {
+            alert('aaa')
+            $("#jqxwindow ").css("display","block");
+            $("#jqxwindow ").jqxWindow( {isModal: true})
+            $.ajax({
+                //几个参数需要注意一下
+                type: "POST",//方法类型
+                url: "/user/login" ,//url
+                data: $('#loginForm').serialize(),
+                success: function (result) {
+                    console.log(result);//打印服务端返回的数据(调试用)
+                }
+            });
+        })
+    });
+</script>
+
 <!--background start-->
 <div id="background">
 <!--container start-->
@@ -23,12 +58,15 @@ String jqx_nav_theme = (String)request.getSession().getAttribute("jqx_nav_theme"
 		&nbsp;
 		<a href="./index.jsp?language=en">English</a>
 		&nbsp;&nbsp;|&nbsp;&nbsp;
-		<fmt:message key="common.role.system_admin" />,
-		<a href="./"><fmt:message key="text.logout" /></a>
-		&nbsp;&nbsp;|&nbsp;&nbsp;
-		<a href="country_policy_management.jsp"><fmt:message key="common.sub_system.country_manage" /></a>
-		&nbsp;
-		<a href="admin_policy_approval.jsp"><fmt:message key="common.sub_system.system_manage" /></a>
+		<a href="" id="login">登录</a>
+		<span id="manage">
+			<fmt:message key="common.role.system_admin" />,
+			<a href="./"><fmt:message key="text.logout" /></a>
+			&nbsp;&nbsp;|&nbsp;&nbsp;
+			<a href="country_policy_management.jsp"><fmt:message key="common.sub_system.country_manage" /></a>
+			&nbsp;
+			<a href="admin_policy_approval.jsp"><fmt:message key="common.sub_system.system_manage" /></a>
+		</span>
 	</div>
 	<div class="clear"></div>
 	<div class="right margin_10" style="visibility: hidden;">
@@ -116,3 +154,26 @@ $(document).ready(function() {
 
 <!--main start-->
 <div id="main">
+	<div id='jqxwindow'>
+		<div>登录</div>
+		<div>
+            <form id="loginForm" onsubmit="return false" action="##" method="post">
+                <div>用户名：<input name="userName" type="text" id="userName" size="15" value=""/></div>
+                <div>密　码：<input name="password" type="password" id="password" size="15" value=""/></div>
+                <div class="submit" onclick="login()"><input type="button" value="登录"></div>
+            </form>
+			<%--<form id="loginForm" method="post">--%>
+				<%--<div>--%>
+					<%--<label>账号</label>--%>
+					<%--<input type="text" id="userName" placeholder="请输入账号"/>--%>
+				<%--</div>--%>
+				<%--<div>--%>
+					<%--<lable>密码</lable>--%>
+					<%--<input type="password" id="password" placeholder="密码"/>--%>
+				<%--</div>--%>
+				<%--<div class="submit">--%>
+					<%--<button type="submit" id="submit" onclick="login()">登录</button>--%>
+				<%--</div>--%>
+			<%--</form>--%>
+		</div>
+	</div>
