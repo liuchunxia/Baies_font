@@ -88,6 +88,24 @@ String jqx_nav_theme = (String)request.getSession().getAttribute("jqx_nav_theme"
 			}
         })
 
+
+        $('#logout').click(function () {
+            $.ajax({
+                type:'GET',
+                url:host+'/user/logout',
+                data: {},
+                xhrFields: {
+                    withCredentials: true
+                },
+                crossDomain: true,
+                async: false ,
+                success: function (resp) {
+                    current_user = {}
+                    window.location.href = 'index.jsp'
+                }.bind(this)
+            })
+        })
+
         $("#submit").click(function () {
             var name= $("#userName").val();
 			if(name == ''){
