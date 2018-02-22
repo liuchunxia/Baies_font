@@ -20,7 +20,7 @@ String jqx_theme = (String)request.getSession().getAttribute("jqx_theme");
 page_id = 1;
 
 $(document).ready(function() {
-	
+
 	$('#cat_tabs').jqxTabs({width: '998px', position: 'top', theme: '<%=jqx_theme %>'});
 
 	var rows = $("#news_ul");
@@ -231,9 +231,9 @@ $(document).ready(function() {
         var r = window.location.search.substr(1).match(reg);  //匹配目标参数
         if (r != null) return decodeURI(r[2]); return null; //返回参数值
     }
-    var tabIndex = getUrlParam('tabIndex');
-
-    $('#cat_tabs').jqxTabs({ selectedItem: tabIndex });
+    // var tabIndex = getUrlParam('tabIndex');
+    //
+    // $('#cat_tabs').jqxTabs({ selectedItem: tabIndex });
 
 });
 
