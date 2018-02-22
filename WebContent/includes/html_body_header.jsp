@@ -17,16 +17,67 @@ String jqx_nav_theme = (String)request.getSession().getAttribute("jqx_nav_theme"
 		margin-top: 10px;
 		text-align: center;
 	}
-	#userName{
+	#username{
 		margin-bottom: 10px;
 	}
-	#manage{
+	#country_manage{
 		display: none;
 	}
+	#system_manage{
+		display: none;
+	};
 </style>
 
 <script type="text/javascript">
+    var current_user = {};
+
     $(document).ready(function () {
+
+        $.ajax({
+            type:'GET',
+            url:host+'/user/current_user',
+            data: {},
+            xhrFields: {
+                withCredentials: true
+            },
+            crossDomain: true,
+            async: false ,
+            success: function (resp) {
+                current_user = resp.data[0]
+                $("#curent_user_detail").text( resp.data[0].username)
+            }.bind(this)
+        })
+
+        user_ban = function () {
+            console.log(current_user)
+            if (current_user.role.name === "Anonymous")
+            {
+                console.log("匿名登录")
+                $('#login').css("display","block")
+                $('#country_manage').css("display","none")
+                $('#system_manage').css("display","none")
+                $('#logout').css("display","none")
+            }
+            else if(current_user.role.name === "CountryQualitative" || current_user.role.name === "User"|| current_user.role.name === "CountryQuantify")
+            {
+                console.log("用户")
+                $('#login').css("display","none")
+                $('#country_manage').css("display","block")
+                $('#system_manage').css("display","none")
+                $('#logout').css("display","block")
+            }
+            else if(current_user.role.name === "Administrator")
+            {
+                console.log("管理")
+                $('#login').css("display","none")
+                $('#country_manage').css("display","block")
+                $('#system_manage').css("display","block")
+                $('#logout').css("display","block")
+            }
+        }
+
+        user_ban()
+
         $("#jqxwindow").jqxWindow({ height:150, width: 200, theme: 'summer',isModal: true,autoOpen: false});
 
         $("#login").click(function () {
@@ -49,10 +100,19 @@ String jqx_nav_theme = (String)request.getSession().getAttribute("jqx_nav_theme"
             $.ajax({
                 //几个参数需要注意一下
                 type: "POST",//方法类型
-                url: "/user/login" ,//url
+                url: host+"/user/login" ,//url
                 data: $('#loginForm').serialize(),
-                success: function (result) {
-                    console.log(result);//打印服务端返回的数据(调试用)
+                xhrFields: {
+                    withCredentials: true
+                },
+                crossDomain: true,
+                success: function (resp) {
+                   if (resp.status === "success") {
+                       window.location.href = 'index.jsp'
+				   }
+				   else {
+                       alert("登录错误")
+				   }
                 }
             });
         })
@@ -72,12 +132,14 @@ String jqx_nav_theme = (String)request.getSession().getAttribute("jqx_nav_theme"
 		&nbsp;&nbsp;|&nbsp;&nbsp;
 		<a href="" id="login">登录</a>
 		<span id="manage">
-			<fmt:message key="common.role.system_admin" />,
-			<a href="./"><fmt:message key="text.logout" /></a>
+			欢迎您<span id="curent_user_detail"></span>
+            <a href="./">
+				<span id="logout"><fmt:message key="text.logout" />
+				</span></a>
 			&nbsp;&nbsp;|&nbsp;&nbsp;
-			<a href="country_policy_management.jsp"><fmt:message key="common.sub_system.country_manage" /></a>
+			<a id="country_manage" href="country_policy_management.jsp"><fmt:message key="common.sub_system.country_manage" /></a>
 			&nbsp;
-			<a href="admin_policy_approval.jsp"><fmt:message key="common.sub_system.system_manage" /></a>
+			<a id="system_manage" href="admin_policy_approval.jsp"><fmt:message key="common.sub_system.system_manage" /></a>
 		</span>
 	</div>
 	<div class="clear"></div>
@@ -170,9 +232,9 @@ $(document).ready(function() {
 		<div>登录</div>
 		<div>
             <form id="loginForm" onsubmit="return false" action="##" method="post">
-                <div>用户名：<input name="userName" type="text" id="userName" size="15" value=""/></div>
+                <div>用户名：<input name="username" type="text" id="username" size="15" value=""/></div>
                 <div>密　码：<input name="password" type="password" id="password" size="15" value=""/></div>
-                <div id="submit" onclick="submit()"><input type="button" value="登录"></div>
+                <div id="submit"><input type="button" value="登录"></div>
             </form>
 			<%--<form id="loginForm" method="post">--%>
 				<%--<div>--%>
