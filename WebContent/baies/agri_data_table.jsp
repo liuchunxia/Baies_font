@@ -222,7 +222,7 @@ $(document).ready(function() {
 	});
 	
 	$('#chart_button').on('click', function() {
-		window.location.href='agri_data_chart.jsp'+parseParam(old_query_args);;
+		window.location.href='agri_data_chart.jsp'+'?'+parseParam(old_query_args);;
 	});
 	
 	$('#export_button').jqxButton({
@@ -365,6 +365,7 @@ $(document).ready(function() {
                                 resp.data, {"index_id":index_id, "country_id":country_id, "kind_id": kind_id},
                                 function (x,y) {
                                     if (x.country.id === y["country_id"] && x.index.id === y["index_id"] && x.kind.id== y['kind_id']) {
+                                        console.log("查找成功", 'x:', x, 'y', y)
                                         return true
                                     }
                                     return false
@@ -408,7 +409,7 @@ $(document).ready(function() {
 
                             for (var data_i in datas) {
                                 var tmp_data = datas[data_i];
-                                console.log("当数据是",[country_id, index_id], "填充",tmp_data)
+                                console.log("当数据是",[country_id, index_id, kind_id], "填充",tmp_data)
                                 line['y'+tmp_data.time] = {value:tmp_data.value, id:tmp_data.id}
                             }
                             console.log("填充完成",line)

@@ -72,6 +72,7 @@ var country_data = [];
 var index_data = [];
 var query_args = getQueryString()
 var old_query_args = getQueryString();
+var kind_data = []
 var local_data = [
 ];
 var data_fields = [
@@ -101,7 +102,7 @@ $(document).ready(function() {
 
     $.ajax({
         type:'GET',
-        url:host+'/quantify/socioeconomic_table',
+        url:host+'/quantify/agriculture_table',
         data: {},
         withCredentials: true,
         async: false,
@@ -232,7 +233,7 @@ $(document).ready(function() {
 
                 var post_data = {note:"", data:[], table_id:""}
                 post_data.table_id = query_args.table_id;
-                post_data.note = $('#arg_note_input').val();
+                post_data.note = $('.arg_note_input').val();
 
                 for (var cell in grid_edited_cells) {
                     post_data.data.push(grid_edited_cells[cell])
@@ -244,7 +245,7 @@ $(document).ready(function() {
                     async: true,
                     crossDomain: true,
                     processData: false,
-                    url: host+"/agriculture_facts/batch",
+                    url: host+"/quantify/agriculture_facts/batch",
                     method: "POST",
                     data: JSON.stringify(post_data),
                     headers: {
@@ -462,6 +463,7 @@ $(document).ready(function() {
                                 resp.data, {"index_id":index_id, "country_id":country_id, "kind_id": kind_id},
                                 function (x,y) {
                                     if (x.country.id === y["country_id"] && x.index.id === y["index_id"] && x.kind.id== y['kind_id']) {
+                                        console.log("查找成功", 'x:', x, 'y', y)
                                         return true
                                     }
                                     return false

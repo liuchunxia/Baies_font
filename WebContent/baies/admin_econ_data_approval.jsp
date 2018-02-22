@@ -21,6 +21,15 @@ String jqx_theme = (String)request.getSession().getAttribute("jqx_theme");
 }
 </style>
 <script>
+    var grid_edited_cells = [];
+
+    var grid_cell_class = function (row, datafield, value, rowdata) {
+        for (var i = 0; i < grid_edited_cells.length; i++) {
+            if(grid_edited_cells[i].row == row && grid_edited_cells[i].datafield == datafield) {
+                return 'grid_edited_cell';
+            }
+        }
+    };
     findArrayByValue = function (ary, value,func) {
         for (var index in ary) {
             if (func(ary[index], value) === true) {
@@ -253,15 +262,7 @@ $(document).ready(function() {
             {name: 'country_id', type:'number',map: 'country_id'},
             {name: 'index_id', type:'number', map:'index_id'}
 		];
-		var grid_edited_cells = [];
 
-		var grid_cell_class = function (row, datafield, value, rowdata) {
-			for (var i = 0; i < grid_edited_cells.length; i++) {
-				if(grid_edited_cells[i].row == row && grid_edited_cells[i].datafield == datafield) {
-					return 'grid_edited_cell';
-				}
-			}
-		};
 		var data_columns = [
 		                   {text: '<fmt:message key="common.dimension.country" />', datafield: 'location', width: 50},
 		                   {text: '<fmt:message key="common.dimension.indicator" />', datafield: 'variable', width: 70}
@@ -449,6 +450,7 @@ $(document).ready(function() {
 
                             console.log('local',resp.data)
                             data_adapter_1.dataBind()
+                            grid_cell_class()
                             $('#diff_grid_1').jqxGrid('render');
                             $('#diff_grid_1').jqxGrid('refresh');
                         }

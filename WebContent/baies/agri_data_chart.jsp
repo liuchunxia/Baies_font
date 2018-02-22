@@ -77,7 +77,7 @@ $(document).ready(function() {
 
     $.ajax({
         type:'GET',
-        url:host+'/quantify/socioeconomic_table',
+        url:host+'/quantify/agriculture_table',
         data: {},
         withCredentials: true,
         async: false,
@@ -212,9 +212,9 @@ $(document).ready(function() {
     var data_source= [];
     var group_source=[];
 	var settings = {
-			title: '<fmt:message key="common.product.rice" /> <fmt:message key="common.indicator.total_production" /> <fmt:message key="text.trend_chart" /> (2005 - 2010)',
+			title: chart_title,
 			description: '',
-			source: chart_title,
+			source: data_source,
 			enableAnimations: true,
 			xAxis: {
 				dataField: 'time',
@@ -313,11 +313,41 @@ $(document).ready(function() {
         console.log('qu', query_args)
     });
 
+    var checked_variable_list_func = function () {
+
+        $('#cat_tree').jqxTree('selectItem',$("#cat_tree").find('li:eq(1)')[0])
+
+        // for (var index_id_i in old_query_args.index_ids) {
+        //    var index_id = old_query_args.index_ids[index_id_i]
+        // 	query_args.index_ids.push(index_id)
+        // }
+        console.log("清空")
+        query_args.country_ids.length = 0
+        for (var country_id_i in old_query_args.country_ids) {
+            var country_id = old_query_args.country_ids[country_id_i]
+            $("#location_list").jqxDropDownList('checkItem',  $("#location_list").jqxDropDownList('getItemByValue',  country_id));
+            $("#location_list").jqxDropDownList('selectItem',  $("#location_list").jqxDropDownList('getItemByValue',  country_id));
+
+        }
+
+        for (var index_id_i in old_query_args.index_ids) {
+            var index_id = old_query_args.country_ids[index_id_i]
+
+            $("#variable_list").jqxDropDownList('checkItem',  $("#variable_list").jqxDropDownList('getItemByValue',  index_id));
+            $("#variable_list").jqxDropDownList('selectItem',  $("#variable_list").jqxDropDownList('getItemByValue',  index_id));
+
+        }
+
+        $('#time_slider').jqxSlider('setValue', [old_query_args.start_time, old_query_args.end_time]);
+
+
+    }()
+
     var tmp = function init_data_columns () {
 
         $.ajax({
             type:'GET',
-            url:host+'/quantify/socioeconomic_facts/graph'+location.search,
+            url:host+'/quantify/agriculture_facts/graph'+location.search,
             data: {},
             withCredentials: true,
             async: true,
@@ -335,8 +365,9 @@ $(document).ready(function() {
 
                 for (var data_i in resp.data) {
 					var data = resp.data[data_i]
+					console.log("获得数据",data)
 					for (var point_i in data.series) {
-					    var point = data[point_i]
+					    var point = data.series[point_i]
 
 						for (var source_i in data_source) {
 					        if (data_source[source_i].time === point.x) {
