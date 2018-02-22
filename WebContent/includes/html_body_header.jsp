@@ -25,7 +25,7 @@ String jqx_nav_theme = (String)request.getSession().getAttribute("jqx_nav_theme"
 	}
 	#system_manage{
 		display: none;
-	};
+	}
 </style>
 
 <script type="text/javascript">
@@ -53,7 +53,7 @@ String jqx_nav_theme = (String)request.getSession().getAttribute("jqx_nav_theme"
             if (current_user.role.name === "Anonymous")
             {
                 console.log("匿名登录")
-                $('#login').css("display","block")
+                $('#login').css("display","inline-block")
                 $('#country_manage').css("display","none")
                 $('#system_manage').css("display","none")
                 $('#logout').css("display","none")
@@ -62,17 +62,17 @@ String jqx_nav_theme = (String)request.getSession().getAttribute("jqx_nav_theme"
             {
                 console.log("用户")
                 $('#login').css("display","none")
-                $('#country_manage').css("display","block")
+                $('#country_manage').css("display","inline-block")
                 $('#system_manage').css("display","none")
-                $('#logout').css("display","block")
+                $('#logout').css("display","inline-block")
             }
             else if(current_user.role.name === "Administrator")
             {
                 console.log("管理")
                 $('#login').css("display","none")
-                $('#country_manage').css("display","block")
-                $('#system_manage').css("display","block")
-                $('#logout').css("display","block")
+                $('#country_manage').css("display","inline-block")
+                $('#system_manage').css("display","inline-block")
+                $('#logout').css("display","inline-block")
             }
         }
 
@@ -151,9 +151,7 @@ String jqx_nav_theme = (String)request.getSession().getAttribute("jqx_nav_theme"
 		<a href="" id="login">登录</a>
 		<span id="manage">
 			欢迎您<span id="curent_user_detail"></span>
-            <a href="./">
-				<span id="logout"><fmt:message key="text.logout" />
-				</span></a>
+			<span style="display: none"> <a href="./" id="logout"><fmt:message key="text.logout" /></a></span>
 			&nbsp;&nbsp;|&nbsp;&nbsp;
 			<a id="country_manage" href="country_policy_management.jsp"><fmt:message key="common.sub_system.country_manage" /></a>
 			&nbsp;
@@ -254,18 +252,5 @@ $(document).ready(function() {
                 <div>密　码：<input name="password" type="password" id="password" size="15" value=""/></div>
                 <div id="submit"><input type="button" value="登录"></div>
             </form>
-			<%--<form id="loginForm" method="post">--%>
-				<%--<div>--%>
-					<%--<label>账号</label>--%>
-					<%--<input type="text" id="userName" placeholder="请输入账号"/>--%>
-				<%--</div>--%>
-				<%--<div>--%>
-					<%--<lable>密码</lable>--%>
-					<%--<input type="password" id="password" placeholder="密码"/>--%>
-				<%--</div>--%>
-				<%--<div class="submit">--%>
-					<%--<button type="submit" id="submit" onclick="login()">登录</button>--%>
-				<%--</div>--%>
-			<%--</form>--%>
 		</div>
 	</div>
