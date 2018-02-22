@@ -45,7 +45,10 @@ $.ajax({
     type:'GET',
     url:host+'/quantify/agriculture_table',
     data: {},
-    withCredentials: true,
+    xhrFields: {
+        withCredentials: true
+    },
+    crossDomain: true,
     async: false ,
     success: function (resp) {
         for (var table in resp.data) {

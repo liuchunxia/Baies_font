@@ -31,6 +31,7 @@ $(document).ready(function() {
     $.ajax({
         type: "get",
         async: false,
+        withCredentials: true,
         url: host+"/qualitative/Post",
         data: {},
         success: function (result) {
