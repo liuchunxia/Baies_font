@@ -324,7 +324,8 @@ $(document).ready(function() {
             {name: 'kind_id', type: 'number' , map:'kind_id'}
 		                   ];
 
-		var data_columns = [        {text: '<fmt:message key="common.dimension.country" />', datafield: 'country', width: 70},
+		var data_columns = [
+		    {text: '<fmt:message key="common.dimension.country" />', datafield: 'country', width: 70},
             {text: '<fmt:message key="common.dimension.product" />', datafield: 'kind', width: 70},
             {text: '<fmt:message key="common.dimension.indicator" />', datafield: 'index', width: 100}];
 
@@ -458,63 +459,74 @@ $(document).ready(function() {
                         withCredentials: true,
                         async: true,
                         success: function (resp) {
-
                             for (var index_id_i in query_args.index_ids) {
                                 var index_id = query_args.index_ids[index_id_i]
                                 for (var country_id_i in query_args.country_ids) {
-                                    var country_id = query_args.country_ids[country_id_i]
+                                    var country_id =query_args.country_ids[country_id_i]
+                                    for (var kind_id_i in query_args.kind_ids) {
+                                        var kind_id = query_args.kind_ids[kind_id_i]
 
-                                    var datas = findArrayByValue(
-                                        resp.data, {"index_id":index_id, "country_id":country_id},
-                                        function (x,y) {
-                                            if (x.country.id === y["country_id"] && x.index.id === y["index_id"]) {
-                                                return true
+                                        var datas = findArrayByValue(
+                                            resp.data, {"index_id":index_id, "country_id":country_id, "kind_id": kind_id},
+                                            function (x,y) {
+                                                if (x.country.id === y["country_id"] && x.index.id === y["index_id"] && x.kind.id== y['kind_id']) {
+                                                    console.log("查找成功", 'x:', x, 'y', y)
+                                                    return true
+                                                }
+                                                return false
                                             }
-                                            return false
+                                        ).data
+
+                                        console.log("fill datas", datas)
+
+                                        var line = {
+                                            country:
+                                            findArrayByValue(country_data,
+                                                country_id,
+                                                function (x,y) {
+                                                    if (x.id === y) {
+                                                        return true
+                                                    }
+                                                    return false
+                                                }
+                                            ).<fmt:message key="data.field" />,
+                                            index: findArrayByValue(cur_indexes,
+                                                index_id,
+                                                function (x,y) {
+                                                    if (x.id === y) {
+                                                        return true
+                                                    }
+                                                    return false
+                                                }
+                                            ).<fmt:message key="data.field" />,
+                                            kind: findArrayByValue(kind_data,
+                                                kind_id,
+                                                function (x,y) {
+                                                    if (x.id === y) {
+                                                        return true
+                                                    }
+                                                    return false
+                                                }
+                                            ).<fmt:message key="data.field" />,
+                                            country_id: country_id,
+                                            index_id: index_id,
+                                            kind_id: kind_id}
+
+                                        for (var data_i in datas) {
+                                            var tmp_data = datas[data_i];
+                                            console.log("当数据是",[country_id, index_id, kind_id], "填充",tmp_data)
+                                            line['y'+tmp_data.time] = {value:tmp_data.value, id:tmp_data.id}
                                         }
-                                    ).data
-
-                                    console.log("fill datas", datas)
-
-                                    var line = {
-                                        location:
-                                        findArrayByValue(country_data,
-                                            country_id,
-                                            function (x,y) {
-                                                if (x.id === y) {
-                                                    return true
-                                                }
-                                                return false
-                                            }
-                                        ).<fmt:message key="data.field" />,
-                                        variable: findArrayByValue(cur_indexes,
-                                            index_id,
-                                            function (x,y) {
-                                                if (x.id === y) {
-                                                    return true
-                                                }
-                                                return false
-                                            }
-                                        ).<fmt:message key="data.field" />,
-                                        country_id: country_id,
-                                        index_id: index_id}
-
-                                    for (var data_i in datas) {
-                                        var tmp_data = datas[data_i];
-                                        console.log("当数据是",[country_id, index_id], "填充",tmp_data)
-                                        line['y'+tmp_data.time] = {value:tmp_data.value, id:tmp_data.id}
+                                        console.log("填充完成",line)
+                                        local_data_1.push(line)
                                     }
-                                    console.log("填充完成",line)
-                                    local_data_1.push(line)
-
                                 }
                             }
-
-                            console.log('local',resp.data)
-                            data_adapter_1.dataBind()
+                            data_adapter_1.dataBind();
                             grid_cell_class()
                             $('#diff_grid_1').jqxGrid('render');
                             $('#diff_grid_1').jqxGrid('refresh');
+
                         }
                     });
 
@@ -527,60 +539,74 @@ $(document).ready(function() {
                         withCredentials: true,
                         async: true,
                         success: function (resp) {
-
                             for (var index_id_i in query_args.index_ids) {
-                                var index_id = query_args.index_ids[index_id_i]
+                                var index_id =query_args.index_ids[index_id_i]
                                 for (var country_id_i in query_args.country_ids) {
                                     var country_id = query_args.country_ids[country_id_i]
+                                    for (var kind_id_i in query_args.kind_ids) {
+                                        var kind_id = query_args.kind_ids[kind_id_i]
 
-                                    var datas = findArrayByValue(
-                                        resp.data, {"index_id":index_id, "country_id":country_id},
-                                        function (x,y) {
-                                            if (x.country.id === y["country_id"] && x.index.id === y["index_id"]) {
-                                                return true
+                                        var datas = findArrayByValue(
+                                            resp.data, {"index_id":index_id, "country_id":country_id, "kind_id": kind_id},
+                                            function (x,y) {
+                                                if (x.country.id === y["country_id"] && x.index.id === y["index_id"] && x.kind.id== y['kind_id']) {
+                                                    console.log("查找成功", 'x:', x, 'y', y)
+                                                    return true
+                                                }
+                                                return false
                                             }
-                                            return false
+                                        ).data
+
+                                        console.log("fill datas", datas)
+
+                                        var line = {
+                                            country:
+                                            findArrayByValue(country_data,
+                                                country_id,
+                                                function (x,y) {
+                                                    if (x.id === y) {
+                                                        return true
+                                                    }
+                                                    return false
+                                                }
+                                            ).<fmt:message key="data.field" />,
+                                            index: findArrayByValue(cur_indexes,
+                                                index_id,
+                                                function (x,y) {
+                                                    if (x.id === y) {
+                                                        return true
+                                                    }
+                                                    return false
+                                                }
+                                            ).<fmt:message key="data.field" />,
+                                            kind: findArrayByValue(kind_data,
+                                                kind_id,
+                                                function (x,y) {
+                                                    if (x.id === y) {
+                                                        return true
+                                                    }
+                                                    return false
+                                                }
+                                            ).<fmt:message key="data.field" />,
+                                            country_id: country_id,
+                                            index_id: index_id,
+                                            kind_id: kind_id}
+
+                                        for (var data_i in datas) {
+                                            var tmp_data = datas[data_i];
+                                            console.log("当数据是",[country_id, index_id, kind_id], "填充",tmp_data)
+                                            line['y'+tmp_data.time] = {value:tmp_data.value, id:tmp_data.id}
                                         }
-                                    ).data
-
-                                    console.log("fill datas", datas)
-
-                                    var line = {
-                                        location:
-                                        findArrayByValue(country_data,
-                                            country_id,
-                                            function (x,y) {
-                                                if (x.id === y) {
-                                                    return true
-                                                }
-                                                return false
-                                            }
-                                        ).<fmt:message key="data.field" />,
-                                        variable: findArrayByValue(cur_indexes,
-                                            index_id,
-                                            function (x,y) {
-                                                if (x.id === y) {
-                                                    return true
-                                                }
-                                                return false
-                                            }
-                                        ).<fmt:message key="data.field" />,
-                                        country_id: country_id,
-                                        index_id: index_id}
-
-                                    for (var data_i in datas) {
-                                        var tmp_data = datas[data_i];
-                                        console.log("当数据是",[country_id, index_id], "填充",tmp_data)
-                                        line['y'+tmp_data.time] = {value:tmp_data.value, id:tmp_data.id}
+                                        console.log("填充完成",line)
+                                        local_data_2.push(line)
                                     }
-                                    console.log("填充完成",line)
-                                    local_data_2.push(line)
-
                                 }
                             }
 
+
                             console.log('local',resp.data)
                             data_adapter_2.dataBind()
+                            grid_cell_class()
                             $('#diff_grid_2').jqxGrid('render');
                             $('#diff_grid_2').jqxGrid('refresh');
                         }
